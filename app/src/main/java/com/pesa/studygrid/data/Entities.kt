@@ -1,5 +1,6 @@
 package com.pesa.studygrid.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -14,6 +15,8 @@ data class GoalEntity(
     val description: String = "",
     /** ARGB color. */
     val color: Int,
+    /** Target active days per week (1..7); 0 = no weekly goal. Added in DB version 2. */
+    @ColumnInfo(defaultValue = "0") val weeklyTarget: Int = 0,
 )
 
 @Entity(

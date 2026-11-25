@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -75,6 +78,8 @@ fun GoalCard(
             Stat(R.drawable.emoji_calendar, ui.stats.total, "Días activos")
         }
 
+        if (ui.goal.weeklyTarget > 0) WeeklyProgress(ui.stats.week, ui.goal.weeklyTarget, color)
+
         val panel = RoundedCornerShape(14.dp)
         Box(
             Modifier
@@ -100,6 +105,39 @@ fun GoalCard(
             })
             Spacer(Modifier.weight(1f))
             Text("Hoy: nivel $todayLevel/$MAX_LEVEL", style = MaterialTheme.typography.bodyMedium, color = a.muted)
+        }
+    }
+}
+
+/** Gel bar inside a recessed track: active days this week vs the weekly target. */
+@Composable
+private fun WeeklyProgress(done: Int, target: Int, color: Color) {
+    val a = LocalAero.current
+    val track = RoundedCornerShape(50)
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Esta semana", style = MaterialTheme.typography.labelMedium, color = a.muted, modifier = Modifier.weight(1f))
+            Text(
+                if (done >= target) "¡Cumplida! $done/$target" else "$done/$target días",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(12.dp)
+                .clip(track)
+                .background(a.graphPanel)
+                .border(1.dp, Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.35f), Color.White.copy(alpha = 0.6f))), track),
+        ) {
+            Box(
+                Modifier
+                    .fillMaxWidth(minOf(1f, done / target.toFloat()))
+                    .fillMaxHeight()
+                    .clip(track)
+                    .background(Brush.verticalGradient(listOf(lerp(color, Color.White, 0.4f), color, lerp(color, Color.Black, 0.2f)))),
+            )
         }
     }
 }

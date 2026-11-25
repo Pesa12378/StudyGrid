@@ -66,8 +66,13 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
 
 ## Funciones nuevas
 
-- [ ] **15. Deshacer**: aviso "Deshacer" de unos segundos después de cambiar un día o borrar una meta.
-- [ ] **16. Meta semanal**: objetivo de N días por semana, con barra de progreso en la tarjeta.
+- [x] **15. Deshacer**: aviso "Deshacer" de unos segundos después de cambiar un día o borrar una meta.
+- [x] **16. Meta semanal**: objetivo de N días por semana, con barra de progreso en la tarjeta.
 - [ ] **17. Widget en la pantalla de inicio**: mapa de calor y "+1 Hoy" (usa Jetpack Glance, dependencia nueva).
 - [ ] **18. Recordatorio diario local**: notificación a la hora que elijas, sin internet (requiere permiso de notificaciones).
 - [ ] **19. Reordenar metas**: arrastrar para cambiar el orden (requiere guardar el orden en la base de datos, con migración de Room).
+
+## Encontrado al probar 15 y 16
+
+- [ ] **20. El nivel 1 casi no se ve en modo día**: un cuadrito con nivel 1 (aqua al 30%) se confunde con uno vacío sobre el panel claro. Subir la opacidad mínima o usar un tono más oscuro en día.
+- [ ] **21. El aviso de "Deshacer" no usa el estilo de la app**: sale con el estilo por defecto de Material (gris oscuro con botón morado). Darle el marco cromado y los colores del tema.

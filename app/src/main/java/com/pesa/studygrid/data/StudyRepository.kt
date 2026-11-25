@@ -11,6 +11,14 @@ class StudyRepository(private val dao: StudyDao) {
     suspend fun saveGoal(goal: GoalEntity) = dao.upsertGoal(goal)
     suspend fun deleteGoal(goal: GoalEntity) = dao.deleteGoal(goal)
     suspend fun bump(goalId: Long, date: LocalDate) = dao.bump(goalId, date.toEpochDay())
+    suspend fun log(goalId: Long, date: LocalDate) = dao.log(goalId, date.toEpochDay())
+    suspend fun logsOf(goalId: Long) = dao.logsOf(goalId)
+    suspend fun restoreGoal(goal: GoalEntity, logs: List<DailyLogEntity>) = dao.restoreGoal(goal, logs)
+
+    /** Undo of a day change: put back exactly what was there ([previous] null = the day was empty). */
+    suspend fun restoreLog(goalId: Long, date: LocalDate, previous: DailyLogEntity?) {
+        if (previous == null) dao.deleteLog(goalId, date.toEpochDay()) else dao.upsertLog(previous)
+    }
 
     suspend fun saveLog(goalId: Long, date: LocalDate, intensity: Int, note: String) {
         val day = date.toEpochDay()
@@ -36,7 +44,7 @@ object BackupJson {
         .put("version", VERSION)
         .put("goals", JSONArray(goals.map {
             JSONObject().put("id", it.id).put("title", it.title)
-                .put("description", it.description).put("color", it.color)
+                .put("description", it.description).put("color", it.color).put("weeklyTarget", it.weeklyTarget)
         }))
         .put("logs", JSONArray(logs.map {
             JSONObject().put("goalId", it.goalId).put("date", LocalDate.ofEpochDay(it.epochDay).toString())
@@ -57,6 +65,8 @@ object BackupJson {
                 title = o.getString("title").also { require(it.isNotBlank()) { "Meta sin título" } },
                 description = o.optString("description"),
                 color = o.getInt("color"),
+                // Optional: backups made before the weekly goal existed don't have it.
+                weeklyTarget = o.optInt("weeklyTarget", 0).also { require(it in 0..7) { "Meta semanal inválida" } },
             )
         }
         val ids = goals.map { it.id }.toSet()

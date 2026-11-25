@@ -3,6 +3,8 @@ package com.pesa.studygrid.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +48,7 @@ fun GoalEditorDialog(initial: GoalEntity?, onSave: (GoalEntity) -> Unit, onDelet
     var title by remember { mutableStateOf(initial?.title ?: "") }
     var description by remember { mutableStateOf(initial?.description ?: "") }
     var color by remember { mutableIntStateOf(initial?.color ?: GoalPalette.first().toArgb()) }
+    var weekly by remember { mutableIntStateOf(initial?.weeklyTarget ?: 0) }
 
     GlassDialog(onDismiss) {
         Text(if (initial == null) "Nueva meta" else "Editar meta", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
@@ -82,6 +85,18 @@ fun GoalEditorDialog(initial: GoalEntity?, onSave: (GoalEntity) -> Unit, onDelet
                 }
             }
         }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Meta semanal", style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
+            TextButton(onClick = { weekly-- }, enabled = weekly > 0) { Text("−", style = MaterialTheme.typography.titleLarge) }
+            Text(
+                if (weekly == 0) "Sin meta" else "$weekly ${if (weekly == 1) "día" else "días"}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.widthIn(min = 68.dp),
+            )
+            TextButton(onClick = { weekly++ }, enabled = weekly < 7) { Text("+", style = MaterialTheme.typography.titleLarge) }
+        }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
             if (initial != null) {
                 TextButton(onClick = onDelete) { Text("Eliminar", color = DangerRed) }
@@ -90,7 +105,7 @@ fun GoalEditorDialog(initial: GoalEntity?, onSave: (GoalEntity) -> Unit, onDelet
             TextButton(onClick = onDismiss) { Text("Cancelar") }
             Spacer(Modifier.width(8.dp))
             GelButton("Guardar", Color(color), enabled = title.isNotBlank(), onClick = {
-                onSave((initial ?: GoalEntity(title = "", color = color)).copy(title = title.trim(), description = description.trim(), color = color))
+                onSave((initial ?: GoalEntity(title = "", color = color)).copy(title = title.trim(), description = description.trim(), color = color, weeklyTarget = weekly))
             })
         }
     }
@@ -106,7 +121,7 @@ fun DeleteGoalDialog(goal: GoalEntity, onConfirm: () -> Unit, onDismiss: () -> U
     GlassDialog(onDismiss) {
         Text("¿Eliminar meta?", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         Text(
-            "Se borrará \"${goal.title}\" con TODO su historial. No se puede deshacer.\n\nEscribe el nombre de la meta para confirmar:",
+            "Se borrará \"${goal.title}\" con TODO su historial. Podrás deshacerlo solo durante unos segundos.\n\nEscribe el nombre de la meta para confirmar:",
             style = MaterialTheme.typography.bodyMedium,
         )
         OutlinedTextField(

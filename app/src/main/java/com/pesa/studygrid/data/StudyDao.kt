@@ -25,6 +25,9 @@ abstract class StudyDao {
     @Query("SELECT * FROM daily_logs WHERE goalId = :goalId AND epochDay = :epochDay")
     abstract suspend fun log(goalId: Long, epochDay: Long): DailyLogEntity?
 
+    @Query("SELECT * FROM daily_logs WHERE goalId = :goalId")
+    abstract suspend fun logsOf(goalId: Long): List<DailyLogEntity>
+
     // Upsert, not REPLACE: REPLACE deletes the row first and would cascade-delete the goal's logs.
     @Upsert
     abstract suspend fun upsertGoal(goal: GoalEntity)
@@ -58,6 +61,16 @@ abstract class StudyDao {
             current?.copy(intensity = minOf(current.intensity + 1, MAX_LEVEL))
                 ?: DailyLogEntity(goalId, epochDay, 1),
         )
+    }
+
+    @Upsert
+    protected abstract suspend fun upsertLogs(logs: List<DailyLogEntity>)
+
+    /** Undo of a goal deletion: puts the goal back with its whole history. */
+    @Transaction
+    open suspend fun restoreGoal(goal: GoalEntity, logs: List<DailyLogEntity>) {
+        upsertGoal(goal)
+        upsertLogs(logs)
     }
 
     /** All-or-nothing: if any insert fails, the previous data stays untouched. */

@@ -16,9 +16,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.pesa.studygrid.data.MAX_LEVEL
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
 
-data class GoalStats(val current: Int, val best: Int, val total: Int)
+/** [week] = active days in the current Monday..Sunday week (for the weekly goal). */
+data class GoalStats(val current: Int, val best: Int, val total: Int, val week: Int)
+
+/** Snackbar text; [undo] non-null shows a "Deshacer" action that runs it. */
+class UiMessage(val text: String, val undo: (suspend () -> Unit)? = null)
 
 data class GoalUi(val goal: GoalEntity, val logs: Map<LocalDate, DailyLogEntity>, val stats: GoalStats)
 
@@ -38,14 +45,16 @@ fun computeStats(active: Set<LocalDate>, today: LocalDate): GoalStats {
         current++
         day = day.minusDays(1)
     }
-    return GoalStats(current, best, active.size)
+    val weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+    val week = active.count { !it.isBefore(weekStart) && !it.isAfter(today) }
+    return GoalStats(current, best, active.size, week)
 }
 
 class StudyViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = StudyRepository(AppDatabase.get(app).dao())
     private val resolver = app.contentResolver
 
-    private val _messages = Channel<String>(Channel.BUFFERED)
+    private val _messages = Channel<UiMessage>(Channel.BUFFERED)
     val messages = _messages.receiveAsFlow()
 
     /** null while the database hasn't emitted yet (avoids flashing the empty state). */
@@ -59,28 +68,43 @@ class StudyViewModel(app: Application) : AndroidViewModel(app) {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    fun bumpToday(goalId: Long) = viewModelScope.launch { repo.bump(goalId, LocalDate.now()) }
+    fun bumpToday(goalId: Long) = viewModelScope.launch {
+        val today = LocalDate.now()
+        val before = repo.log(goalId, today)
+        repo.bump(goalId, today)
+        val level = minOf((before?.intensity ?: 0) + 1, MAX_LEVEL)
+        _messages.send(UiMessage("Hoy: nivel $level") { repo.restoreLog(goalId, today, before) })
+    }
 
-    fun saveLog(goalId: Long, date: LocalDate, intensity: Int, note: String) =
-        viewModelScope.launch { repo.saveLog(goalId, date, intensity, note) }
+    fun saveLog(goalId: Long, date: LocalDate, intensity: Int, note: String) = viewModelScope.launch {
+        val before = repo.log(goalId, date)
+        repo.saveLog(goalId, date, intensity, note)
+        _messages.send(UiMessage("Día guardado") { repo.restoreLog(goalId, date, before) })
+    }
 
     fun saveGoal(goal: GoalEntity) = viewModelScope.launch { repo.saveGoal(goal) }
 
-    fun deleteGoal(goal: GoalEntity) = viewModelScope.launch { repo.deleteGoal(goal) }
+    fun deleteGoal(goal: GoalEntity) = viewModelScope.launch {
+        val logs = repo.logsOf(goal.id)
+        repo.deleteGoal(goal)
+        _messages.send(UiMessage("Meta \"${goal.title}\" eliminada") { repo.restoreGoal(goal, logs) })
+    }
+
+    fun undo(message: UiMessage) = viewModelScope.launch { message.undo?.invoke() }
 
     fun export(uri: Uri) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
             val json = repo.exportJson()
             resolver.openOutputStream(uri, "wt")!!.use { it.write(json.toByteArray()) }
-        }.onSuccess { _messages.send("Respaldo exportado") }
-            .onFailure { _messages.send("No se pudo exportar: ${it.message}") }
+        }.onSuccess { _messages.send(UiMessage("Respaldo exportado")) }
+            .onFailure { _messages.send(UiMessage("No se pudo exportar: ${it.message}")) }
     }
 
     fun import(uri: Uri) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
             val text = resolver.openInputStream(uri)!!.use { it.readBytes().decodeToString() }
             repo.importJson(text)
-        }.onSuccess { _messages.send("Respaldo importado") }
-            .onFailure { _messages.send("Archivo inválido, no se cambió nada: ${it.message}") }
+        }.onSuccess { _messages.send(UiMessage("Respaldo importado")) }
+            .onFailure { _messages.send(UiMessage("Archivo inválido, no se cambió nada: ${it.message}")) }
     }
 }

@@ -61,6 +61,9 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarResult
+import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 
 private sealed interface GoalDialog {
@@ -73,7 +76,17 @@ private sealed interface GoalDialog {
 fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = viewModel()) {
     val goals by vm.goals.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
-    LaunchedEffect(Unit) { vm.messages.collect { snackbar.showSnackbar(it) } }
+    LaunchedEffect(Unit) {
+        // collectLatest: a new message replaces the visible one instead of queueing (fast "+1" taps).
+        vm.messages.collectLatest { m ->
+            val result = snackbar.showSnackbar(
+                m.text,
+                actionLabel = if (m.undo != null) "Deshacer" else null,
+                duration = SnackbarDuration.Short,
+            )
+            if (result == SnackbarResult.ActionPerformed) vm.undo(m)
+        }
+    }
 
     var goalDialog by remember { mutableStateOf<GoalDialog?>(null) }
     var deleting by remember { mutableStateOf<GoalEntity?>(null) }
