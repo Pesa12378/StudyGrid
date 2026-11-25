@@ -76,3 +76,24 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
 
 - [x] **20. El nivel 1 casi no se ve en modo día**: un cuadrito con nivel 1 (aqua al 30%) se confunde con uno vacío sobre el panel claro. Subir la opacidad mínima o usar un tono más oscuro en día.
 - [x] **21. El aviso de "Deshacer" no usa el estilo de la app**: sale con el estilo por defecto de Material (gris oscuro con botón morado). Darle el marco cromado y los colores del tema.
+
+## Ideas siguientes
+
+- [ ] **22. Estadísticas por mes**: días activos y nivel promedio por mes, con una gráfica pequeña (pantalla o sección nueva).
+- [ ] **23. Elegir la meta de cada widget**: hoy muestra la primera de la lista; agregar una pantalla de configuración al colocar el widget.
+- [ ] **24. Exportar el mapa de calor como imagen** para compartirlo (renderizar la tarjeta a bitmap y abrir el menú de compartir).
+- [ ] **25. Ver notas en el mapa**: mantener presionado un día con nota muestra el texto sin abrir el editor.
+- [ ] **26. Logros**: insignias al llegar a rachas de 7, 30 y 100 días.
+
+## Antes de publicar
+
+- [ ] **27. Llave de firma propia**: la release está firmada con la llave local de pruebas (`signingConfig = debug`). Crear un keystore propio, guardarlo fuera de git y respaldarlo; si se pierde, no se puede actualizar la app.
+
+## Para seguir en otra computadora
+
+1. Clonar: `git clone https://github.com/Pesa12378/StudyGrid.git`
+2. Instalar **JDK 17** y el **Android SDK** con `platforms;android-35` (no hace falta Android Studio).
+3. Crear `local.properties` con `sdk.dir=<ruta al SDK>` (no se sube a git).
+4. `./gradlew testDebugUnitTest assembleRelease` → `app/build/outputs/apk/release/app-release.apk`.
+5. Datos de prueba: exportar un respaldo desde la app y correr
+   `python tools/demo_fill.py respaldo.json historial.json 2026-07-01 <hoy>`; luego importar `historial.json`.
