@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -50,6 +51,8 @@ private val LEVEL_COLORS = listOf(
 private val DAY_LABELS = listOf("L", "M", "X", "J", "V", "S", "D")
 private val MONTH_FORMAT = DateTimeFormatter.ofPattern("MMM", Spanish)
 private val CELL_DATE = DateTimeFormatter.ofPattern("d 'de' MMMM", Spanish)
+
+internal val LEVEL_NAMES = listOf("Nada", "Bajo", "Medio", "Alto", "Intenso")
 
 fun levelColor(level: Int): Color = LEVEL_COLORS[level.coerceIn(0, MAX_LEVEL)]
 
@@ -105,6 +108,21 @@ fun ContributionGraph(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+/** Color key for the heatmap: one swatch per level with its name (Bajo, Medio, Alto, Intenso). */
+@Composable
+fun LevelLegend(modifier: Modifier = Modifier) {
+    val a = LocalAero.current
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        for (level in 1..MAX_LEVEL) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(11.dp).clip(CELL_SHAPE).background(levelColor(level)))
+                Spacer(Modifier.width(4.dp))
+                Text(LEVEL_NAMES[level], fontSize = 10.sp, color = a.muted)
             }
         }
     }

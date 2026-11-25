@@ -44,7 +44,6 @@ import com.pesa.studygrid.ui.theme.LocalAero
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-private val LEVEL_NAMES = listOf("Nada", "Bajo", "Medio", "Alto", "Intenso")
 private val DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM 'de' yyyy", Spanish)
 
 /** Edits one day. ‹ › move to the previous/next day (never past today) to fix a tap on the wrong tiny cell. */
