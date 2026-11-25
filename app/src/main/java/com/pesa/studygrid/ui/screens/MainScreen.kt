@@ -12,6 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.graphics.graphicsLayer
+import com.pesa.studygrid.ui.GoalUi
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
@@ -49,6 +55,7 @@ import com.pesa.studygrid.ui.components.ChromeRoundButton
 import com.pesa.studygrid.ui.components.ChromeSnackbar
 import com.pesa.studygrid.ui.components.ConfirmDialog
 import com.pesa.studygrid.ui.components.DeleteGoalDialog
+import com.pesa.studygrid.ui.components.ReminderDialog
 import com.pesa.studygrid.ui.components.GoalCard
 import com.pesa.studygrid.ui.components.GoalEditorDialog
 import com.pesa.studygrid.ui.components.LogEditorDialog
@@ -94,6 +101,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
     var logTarget by remember { mutableStateOf<Pair<Long, LocalDate>?>(null) }
     var pendingImport by remember { mutableStateOf<Uri?>(null) }
     var menuOpen by remember { mutableStateOf(false) }
+    var showReminder by remember { mutableStateOf(false) }
 
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
         uri?.let(vm::export)
@@ -144,6 +152,10 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                                             importLauncher.launch(arrayOf("application/json", "application/octet-stream", "text/plain"))
                                         },
                                     )
+                                    DropdownMenuItem(
+                                        text = { Text("Recordatorio diario") },
+                                        onClick = { menuOpen = false; showReminder = true },
+                                    )
                                 }
                             }
                         },
@@ -157,22 +169,38 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                 snackbarHost = { SnackbarHost(snackbar) { ChromeSnackbar(it) } },
             ) { padding ->
                 val list = goals
+                // Local copy so dragging reorders instantly; re-synced whenever the DB emits.
+                val local = remember { mutableStateListOf<GoalUi>() }
+                LaunchedEffect(list) { local.clear(); local.addAll(list.orEmpty()) }
+                val lazyState = rememberLazyListState()
+                val reorderState = rememberReorderableLazyListState(lazyState) { from, to ->
+                    local.add(to.index, local.removeAt(from.index))
+                }
                 when {
                     list == null -> Unit
                     list.isEmpty() -> EmptyState(Modifier.padding(padding))
                     // Starts below the transparent top bar so cards never scroll under the title.
                     else -> LazyColumn(
                         modifier = Modifier.padding(top = padding.calculateTopPadding()),
+                        state = lazyState,
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = padding.calculateBottomPadding() + 104.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        items(list, key = { it.goal.id }) { ui ->
-                            GoalCard(
-                                ui = ui,
-                                onBumpToday = { vm.bumpToday(ui.goal.id) },
-                                onDayClick = { date -> logTarget = ui.goal.id to date },
-                                onEdit = { goalDialog = GoalDialog.Edit(ui.goal) },
-                            )
+                        items(local, key = { it.goal.id }) { ui ->
+                            ReorderableItem(reorderState, key = ui.goal.id) { isDragging ->
+                                Box(
+                                    Modifier
+                                        .graphicsLayer { if (isDragging) { scaleX = 1.02f; scaleY = 1.02f } }
+                                        .longPressDraggableHandle(onDragStopped = { vm.reorder(local.map { it.goal.id }) }),
+                                ) {
+                                    GoalCard(
+                                        ui = ui,
+                                        onBumpToday = { vm.bumpToday(ui.goal.id) },
+                                        onDayClick = { date -> logTarget = ui.goal.id to date },
+                                        onEdit = { goalDialog = GoalDialog.Edit(ui.goal) },
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -196,6 +224,8 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
             onDismiss = { deleting = null },
         )
     }
+
+    if (showReminder) ReminderDialog(onDismiss = { showReminder = false })
 
     pendingImport?.let { uri ->
         ConfirmDialog(

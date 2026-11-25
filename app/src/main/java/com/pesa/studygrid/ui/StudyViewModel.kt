@@ -17,6 +17,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.pesa.studygrid.data.MAX_LEVEL
+import com.pesa.studygrid.widget.StudyGridWidget
+import androidx.glance.appwidget.updateAll
+import kotlinx.coroutines.flow.drop
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
@@ -68,6 +71,13 @@ class StudyViewModel(app: Application) : AndroidViewModel(app) {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    init {
+        // Keep the home-screen widget in sync with every change made in the app (drop the initial load).
+        viewModelScope.launch {
+            combine(repo.goals, repo.logs) { _, _ -> }.drop(1).collect { StudyGridWidget().updateAll(app) }
+        }
+    }
+
     fun bumpToday(goalId: Long) = viewModelScope.launch {
         val today = LocalDate.now()
         val before = repo.log(goalId, today)
@@ -83,6 +93,8 @@ class StudyViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun saveGoal(goal: GoalEntity) = viewModelScope.launch { repo.saveGoal(goal) }
+
+    fun reorder(ids: List<Long>) = viewModelScope.launch { repo.reorder(ids) }
 
     fun deleteGoal(goal: GoalEntity) = viewModelScope.launch {
         val logs = repo.logsOf(goal.id)

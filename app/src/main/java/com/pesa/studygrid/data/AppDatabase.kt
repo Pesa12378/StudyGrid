@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [GoalEntity::class, DailyLogEntity::class], version = 2, exportSchema = false)
+@Database(entities = [GoalEntity::class, DailyLogEntity::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun dao(): StudyDao
 
@@ -19,11 +19,19 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /** v3: manual goal order. Must match GoalEntity.position exactly; existing goals keep their id order. */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE goals ADD COLUMN position INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("UPDATE goals SET position = id")
+            }
+        }
+
         @Volatile private var instance: AppDatabase? = null
 
         fun get(context: Context): AppDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "studygrid.db")
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build()
                 .also { instance = it }
         }

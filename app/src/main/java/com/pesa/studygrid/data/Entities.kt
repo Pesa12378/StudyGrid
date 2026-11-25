@@ -17,6 +17,8 @@ data class GoalEntity(
     val color: Int,
     /** Target active days per week (1..7); 0 = no weekly goal. Added in DB version 2. */
     @ColumnInfo(defaultValue = "0") val weeklyTarget: Int = 0,
+    /** Display order (ascending). Added in DB version 3. */
+    @ColumnInfo(defaultValue = "0") val position: Int = 0,
 )
 
 @Entity(

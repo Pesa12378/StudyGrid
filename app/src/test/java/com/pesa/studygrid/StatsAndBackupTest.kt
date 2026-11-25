@@ -48,6 +48,11 @@ class StatsAndBackupTest {
         assertEquals(0, BackupJson.decode(json).first.single().weeklyTarget)
     }
 
+    @Test fun oldBackupWithoutPositionKeepsArrayOrder() {
+        val json = """{"version":1,"goals":[{"id":5,"title":"A","color":0},{"id":2,"title":"B","color":0},{"id":9,"title":"C","color":0}],"logs":[]}"""
+        assertEquals(listOf(0, 1, 2), BackupJson.decode(json).first.map { it.position })
+    }
+
     @Test fun rejectsBadWeeklyTarget() {
         val json = BackupJson.encode(listOf(GoalEntity(1, "A", "", 0, 9)), emptyList())
         assertThrows(IllegalArgumentException::class.java) { BackupJson.decode(json) }

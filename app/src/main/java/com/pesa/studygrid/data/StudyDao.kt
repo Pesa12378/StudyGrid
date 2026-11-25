@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class StudyDao {
-    @Query("SELECT * FROM goals ORDER BY id")
+    @Query("SELECT * FROM goals ORDER BY position, id")
     abstract fun goals(): Flow<List<GoalEntity>>
 
     @Query("SELECT * FROM daily_logs")
     abstract fun logs(): Flow<List<DailyLogEntity>>
 
-    @Query("SELECT * FROM goals ORDER BY id")
+    @Query("SELECT * FROM goals ORDER BY position, id")
     abstract suspend fun allGoals(): List<GoalEntity>
 
     @Query("SELECT * FROM daily_logs ORDER BY goalId, epochDay")
@@ -52,6 +52,17 @@ abstract class StudyDao {
 
     @Insert
     protected abstract suspend fun insertLogs(logs: List<DailyLogEntity>)
+
+    @Query("SELECT COALESCE(MAX(position), -1) + 1 FROM goals")
+    abstract suspend fun nextPosition(): Int
+
+    @Query("UPDATE goals SET position = :position WHERE id = :id")
+    protected abstract suspend fun setPosition(id: Long, position: Int)
+
+    @Transaction
+    open suspend fun reorder(idsInOrder: List<Long>) {
+        idsInOrder.forEachIndexed { index, id -> setPosition(id, index) }
+    }
 
     /** +1 on a day, capped at [MAX_LEVEL]. */
     @Transaction

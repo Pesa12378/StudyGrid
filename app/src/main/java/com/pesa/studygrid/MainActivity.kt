@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.pesa.studygrid.reminder.Reminder
 import com.pesa.studygrid.ui.screens.MainScreen
 import com.pesa.studygrid.ui.theme.StudyGridTheme
 
@@ -18,6 +19,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // Re-arm the daily reminder (alarms are lost on force-stop); no-op when it's off.
+        Reminder.schedule(applicationContext)
         val prefs = getSharedPreferences("settings", MODE_PRIVATE)
         setContent {
             var dark by remember { mutableStateOf(prefs.getBoolean("dark", true)) }

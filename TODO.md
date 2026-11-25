@@ -69,8 +69,10 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
 - [x] **15. Deshacer**: aviso "Deshacer" de unos segundos después de cambiar un día o borrar una meta.
 - [x] **16. Meta semanal**: objetivo de N días por semana, con barra de progreso en la tarjeta.
 - [ ] **17. Widget en la pantalla de inicio**: mapa de calor y "+1 Hoy" (usa Jetpack Glance, dependencia nueva).
+  - Implementado y registrado en el sistema. Falta: agregarlo a la pantalla de inicio y probar "+1 Hoy" desde el widget.
 - [ ] **18. Recordatorio diario local**: notificación a la hora que elijas, sin internet (requiere permiso de notificaciones).
-- [ ] **19. Reordenar metas**: arrastrar para cambiar el orden (requiere guardar el orden en la base de datos, con migración de Room).
+  - Implementado; el diálogo funciona. Falta: activarlo (pide permiso de notificaciones) y comprobar que llegue el aviso y que se reprograme tras reiniciar el teléfono.
+- [x] **19. Reordenar metas**: arrastrar para cambiar el orden (requiere guardar el orden en la base de datos, con migración de Room).
 
 ## Encontrado al probar 15 y 16
 

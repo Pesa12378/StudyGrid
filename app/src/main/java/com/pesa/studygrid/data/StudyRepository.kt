@@ -8,7 +8,11 @@ class StudyRepository(private val dao: StudyDao) {
     val goals = dao.goals()
     val logs = dao.logs()
 
-    suspend fun saveGoal(goal: GoalEntity) = dao.upsertGoal(goal)
+    // New goals go to the end of the list.
+    suspend fun saveGoal(goal: GoalEntity) =
+        dao.upsertGoal(if (goal.id == 0L) goal.copy(position = dao.nextPosition()) else goal)
+
+    suspend fun reorder(ids: List<Long>) = dao.reorder(ids)
     suspend fun deleteGoal(goal: GoalEntity) = dao.deleteGoal(goal)
     suspend fun bump(goalId: Long, date: LocalDate) = dao.bump(goalId, date.toEpochDay())
     suspend fun log(goalId: Long, date: LocalDate) = dao.log(goalId, date.toEpochDay())
@@ -45,6 +49,7 @@ object BackupJson {
         .put("goals", JSONArray(goals.map {
             JSONObject().put("id", it.id).put("title", it.title)
                 .put("description", it.description).put("color", it.color).put("weeklyTarget", it.weeklyTarget)
+                .put("position", it.position)
         }))
         .put("logs", JSONArray(logs.map {
             JSONObject().put("goalId", it.goalId).put("date", LocalDate.ofEpochDay(it.epochDay).toString())
@@ -67,6 +72,8 @@ object BackupJson {
                 color = o.getInt("color"),
                 // Optional: backups made before the weekly goal existed don't have it.
                 weeklyTarget = o.optInt("weeklyTarget", 0).also { require(it in 0..7) { "Meta semanal inválida" } },
+                // Old backups lack it: fall back to array order.
+                position = o.optInt("position", i),
             )
         }
         val ids = goals.map { it.id }.toSet()
