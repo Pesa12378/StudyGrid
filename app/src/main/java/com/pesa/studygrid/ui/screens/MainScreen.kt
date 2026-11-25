@@ -153,8 +153,10 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                 when {
                     list == null -> Unit
                     list.isEmpty() -> EmptyState(Modifier.padding(padding))
+                    // Starts below the transparent top bar so cards never scroll under the title.
                     else -> LazyColumn(
-                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = padding.calculateTopPadding() + 8.dp, bottom = padding.calculateBottomPadding() + 104.dp),
+                        modifier = Modifier.padding(top = padding.calculateTopPadding()),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = padding.calculateBottomPadding() + 104.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         items(list, key = { it.goal.id }) { ui ->
