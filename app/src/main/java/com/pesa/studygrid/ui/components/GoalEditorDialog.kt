@@ -2,7 +2,9 @@ package com.pesa.studygrid.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -35,6 +37,9 @@ import androidx.compose.ui.unit.dp
 import com.pesa.studygrid.data.GoalEntity
 import com.pesa.studygrid.ui.theme.GoalPalette
 
+/** Spoken names for [GoalPalette], same order. */
+private val COLOR_NAMES = listOf("aqua", "lima", "cielo", "violeta", "coral")
+
 /** [initial] null = create a new goal. Delete is only reachable from here (edit mode), on purpose. */
 @Composable
 fun GoalEditorDialog(initial: GoalEntity?, onSave: (GoalEntity) -> Unit, onDelete: () -> Unit, onDismiss: () -> Unit) {
@@ -61,7 +66,7 @@ fun GoalEditorDialog(initial: GoalEntity?, onSave: (GoalEntity) -> Unit, onDelet
         )
         Text("Color", style = MaterialTheme.typography.labelLarge)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            for (c in GoalPalette) {
+            GoalPalette.forEachIndexed { i, c ->
                 val selected = c.toArgb() == color
                 Box(
                     Modifier
@@ -69,7 +74,8 @@ fun GoalEditorDialog(initial: GoalEntity?, onSave: (GoalEntity) -> Unit, onDelet
                         .clip(CircleShape)
                         .background(c)
                         .border(if (selected) 3.dp else 1.dp, if (selected) MaterialTheme.colorScheme.onSurface else Color.White.copy(alpha = 0.4f), CircleShape)
-                        .clickable(role = Role.RadioButton) { color = c.toArgb() },
+                        .semantics { contentDescription = "Color ${COLOR_NAMES[i]}" }
+                        .selectable(selected = selected, role = Role.RadioButton) { color = c.toArgb() },
                     contentAlignment = Alignment.Center,
                 ) {
                     if (selected) Icon(Icons.Filled.Check, "Seleccionado", tint = Color(0xFF06121F))

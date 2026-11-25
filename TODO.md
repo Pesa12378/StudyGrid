@@ -26,12 +26,12 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
   - Problema: blanco sobre `#FF8A65` tiene contraste 2.3:1 y sobre `#4FA3FF` 2.6:1; el mínimo es 4.5:1.
   - Arreglo: elegir siempre el color de texto (claro u oscuro) que dé más contraste con el fondo.
 
-- [ ] **5. "Guardar" sin título no hace nada**
+- [x] **5. "Guardar" sin título no hace nada**
   - Dónde: [GoalEditorDialog.kt](app/src/main/java/com/pesa/studygrid/ui/components/GoalEditorDialog.kt) → botón Guardar
   - Problema: con el título vacío, el toque se ignora sin avisar.
   - Arreglo: `enabled = title.isNotBlank()` en el `GelButton`.
 
-- [ ] **6. Los cuadritos (14dp) son muy chicos para el dedo**
+- [x] **6. Los cuadritos (14dp) son muy chicos para el dedo**
   - Dónde: [ContributionGraph.kt](app/src/main/java/com/pesa/studygrid/ui/components/ContributionGraph.kt), [LogEditorDialog.kt](app/src/main/java/com/pesa/studygrid/ui/components/LogEditorDialog.kt)
   - Problema: es fácil tocar el día de al lado y registrar la fecha equivocada.
   - Arreglo: flechas ‹ › en el diálogo del día para moverse al día anterior o siguiente (sin pasar de hoy).
@@ -42,7 +42,7 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
 
 ## Estaría bien
 
-- [ ] **8. "Hoy" no se distingue en el mapa de calor**
+- [x] **8. "Hoy" no se distingue en el mapa de calor**
   - Dónde: [ContributionGraph.kt](app/src/main/java/com/pesa/studygrid/ui/components/ContributionGraph.kt)
   - Arreglo: borde brillante en la celda de hoy.
 
@@ -50,18 +50,18 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
   - Dónde: [MainScreen.kt](app/src/main/java/com/pesa/studygrid/ui/screens/MainScreen.kt) → `EmptyState`
   - Arreglo: usar el mismo `chromeBezel` que las tarjetas.
 
-- [ ] **10. Colores del tema sin uso**
+- [x] **10. Colores del tema sin uso**
   - Dónde: [Theme.kt](app/src/main/java/com/pesa/studygrid/ui/theme/Theme.kt) → `borderTop`, `borderBottom`
   - Arreglo: borrarlos (6 líneas).
 
-- [ ] **11. Parámetros que nadie cambia**
+- [x] **11. Parámetros que nadie cambia**
   - Dónde: [Glass.kt](app/src/main/java/com/pesa/studygrid/ui/components/Glass.kt) → `GelButton(shape)`, `glass(tint, blur, bevel, depth)`
   - Arreglo: convertirlos en constantes (~8 líneas menos).
 
 ## Pendientes de diseño
 
-- [ ] **12. Marco cromado más grueso**: bisel de ~12dp en dos tonos de metal, tornillos y esquinas recortadas en ángulo, al estilo del skin de referencia.
-- [ ] **13. El botón + tapa el "+1 Hoy" de la última tarjeta**: más espacio al final de la lista.
+- [x] **12. Marco cromado más grueso**: bisel de ~12dp en dos tonos de metal, tornillos y esquinas recortadas en ángulo, al estilo del skin de referencia.
+- [x] **13. El botón + tapa el "+1 Hoy" de la última tarjeta**: más espacio al final de la lista.
 - [ ] **14. Fondo de día con tus tonos verde y azul**: necesita una foto de Unsplash o Pexels (río turquesa, agua con piedras o canicas). Las fotos del moodboard no tienen licencia.
 
 ## Funciones nuevas

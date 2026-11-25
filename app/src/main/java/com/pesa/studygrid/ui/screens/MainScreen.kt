@@ -52,6 +52,7 @@ import com.pesa.studygrid.ui.components.GoalCard
 import com.pesa.studygrid.ui.components.GoalEditorDialog
 import com.pesa.studygrid.ui.components.LogEditorDialog
 import com.pesa.studygrid.ui.components.glass
+import com.pesa.studygrid.ui.components.chromeBezel
 import com.pesa.studygrid.ui.theme.LocalAero
 import com.pesa.studygrid.R
 import com.pesa.studygrid.ui.components.LocalBackdrop
@@ -200,9 +201,9 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
             LogEditorDialog(
                 goalTitle = ui.goal.title,
                 color = Color(ui.goal.color),
-                date = date,
-                current = ui.logs[date],
-                onSave = { level, note -> vm.saveLog(goalId, date, level, note); logTarget = null },
+                initialDate = date,
+                logs = ui.logs,
+                onSave = { day, level, note -> vm.saveLog(goalId, day, level, note); logTarget = null },
                 onDismiss = { logTarget = null },
             )
         }
@@ -213,7 +214,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
 private fun EmptyState(modifier: Modifier) {
     Box(modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
         Column(
-            Modifier.glass().padding(28.dp),
+            Modifier.glass().chromeBezel(24.dp).padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {

@@ -25,8 +25,6 @@ data class AeroColors(
     /** Laid over the background photo: darkens it to "night" in dark mode, softens it in light mode. */
     val scrim: Color,
     val glassTint: Color,
-    val borderTop: Color,
-    val borderBottom: Color,
     val graphPanel: Color,
     val emptyCell: Color,
     val emptyCellBorder: Color,
@@ -43,8 +41,6 @@ data class AeroColors(
 private val DarkAero = AeroColors(
     scrim = Color(0xFF041322).copy(alpha = 0.62f),
     glassTint = Color.White.copy(alpha = 0.08f),
-    borderTop = Color.White.copy(alpha = 0.35f),
-    borderBottom = Color.White.copy(alpha = 0.05f),
     graphPanel = Color(0xFF0A1A2B).copy(alpha = 0.62f),
     emptyCell = Color.White.copy(alpha = 0.07f),
     emptyCellBorder = Color.White.copy(alpha = 0.12f),
@@ -58,7 +54,6 @@ private val DarkAero = AeroColors(
 
 // Day palette sampled from the user's "Green and Blue" moodboard (turquoise water, jade, teal, marble blue).
 private val Turquoise = Color(0xFF03AAB1)
-private val PaleAqua = Color(0xFF8DEDF2)
 private val Jade = Color(0xFF4FAA92)
 private val DeepTeal = Color(0xFF026B72)
 private val AbyssTeal = Color(0xFF0E504F)
@@ -66,8 +61,6 @@ private val AbyssTeal = Color(0xFF0E504F)
 private val LightAero = AeroColors(
     scrim = Turquoise.copy(alpha = 0.16f),
     glassTint = Color(0xFFE6FAF7).copy(alpha = 0.32f),
-    borderTop = Color.White.copy(alpha = 0.95f),
-    borderBottom = PaleAqua.copy(alpha = 0.40f),
     graphPanel = Color(0xFFE9FBF7).copy(alpha = 0.62f),
     emptyCell = AbyssTeal.copy(alpha = 0.09f),
     emptyCellBorder = AbyssTeal.copy(alpha = 0.17f),

@@ -88,8 +88,8 @@ fun GoalCard(
             ContributionGraph(ui.logs, color, onDayClick)
         }
 
+        // "+1 Hoy" sits on the left so the bottom-right FAB never covers it while scrolling.
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Hoy: nivel $todayLevel/$MAX_LEVEL", style = MaterialTheme.typography.bodyMedium, color = a.muted, modifier = Modifier.weight(1f))
             GelButton("+1 Hoy", color, onClick = {
                 if (todayLevel >= MAX_LEVEL) {
                     view.performHapticFeedback(HapticFeedbackConstants.REJECT)
@@ -98,6 +98,8 @@ fun GoalCard(
                     onBumpToday()
                 }
             })
+            Spacer(Modifier.weight(1f))
+            Text("Hoy: nivel $todayLevel/$MAX_LEVEL", style = MaterialTheme.typography.bodyMedium, color = a.muted)
         }
     }
 }

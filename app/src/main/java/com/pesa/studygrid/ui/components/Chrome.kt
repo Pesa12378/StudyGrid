@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.pesa.studygrid.ui.theme.LocalAero
 
 private val TAB_HEIGHT = 34.dp
-private val BEZEL = 7.dp
+private val BEZEL = 11.dp
 
 /**
  * Thick polished-metal frame drawn over a panel: metal ring, dark outer edge, inner groove,
@@ -56,13 +56,38 @@ fun Modifier.chromeBezel(cornerRadius: Dp): Modifier {
         // Inset shadow just inside the ring, so the panel reads as recessed.
         drawRect(Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.22f), Color.Transparent), startY = bw, endY = bw + 14.dp.toPx()))
         drawContent()
+        // Two-tone metal: outer band lit from above, inner band with the gradient reversed (reads as a bevel step).
+        val outer = bw * 0.6f
+        val inner = bw - outer
         drawRoundRect(
             Brush.verticalGradient(chrome),
-            topLeft = Offset(bw / 2, bw / 2),
-            size = Size(w - bw, h - bw),
-            cornerRadius = CornerRadius(r - bw / 2),
-            style = Stroke(bw),
+            topLeft = Offset(outer / 2, outer / 2),
+            size = Size(w - outer, h - outer),
+            cornerRadius = CornerRadius(r - outer / 2),
+            style = Stroke(outer),
         )
+        drawRoundRect(
+            Brush.verticalGradient(chrome.reversed()),
+            topLeft = Offset(outer + inner / 2, outer + inner / 2),
+            size = Size(w - 2 * outer - inner, h - 2 * outer - inner),
+            cornerRadius = CornerRadius(r - outer - inner / 2),
+            style = Stroke(inner),
+        )
+        drawRoundRect(
+            Color.Black.copy(alpha = 0.30f),
+            topLeft = Offset(outer, outer),
+            size = Size(w - 2 * outer, h - 2 * outer),
+            cornerRadius = CornerRadius(r - outer),
+            style = Stroke(0.75.dp.toPx()),
+        )
+        // Screws on the outer band, clear of the rounded corners and the title plate.
+        val screwR = outer * 0.36f
+        val inset = r + 6.dp.toPx()
+        for (s in listOf(Offset(inset, outer / 2), Offset(w - inset, outer / 2), Offset(inset, h - outer / 2), Offset(w - inset, h - outer / 2))) {
+            drawCircle(Brush.linearGradient(chrome.reversed(), start = s - Offset(screwR, screwR), end = s + Offset(screwR, screwR)), screwR, s)
+            drawCircle(Color.Black.copy(alpha = 0.5f), screwR, s, style = Stroke(0.75.dp.toPx()))
+            drawLine(Color.Black.copy(alpha = 0.55f), s - Offset(screwR * 0.6f, -screwR * 0.6f), s + Offset(screwR * 0.6f, -screwR * 0.6f), 0.9.dp.toPx())
+        }
         drawRoundRect(Color.Black.copy(alpha = 0.40f), cornerRadius = CornerRadius(r), style = Stroke(1.dp.toPx()))
         drawRoundRect(
             Color.Black.copy(alpha = 0.45f),
@@ -175,11 +200,11 @@ fun ChromeCard(
                 .fillMaxWidth()
                 .glass(cornerRadius = 24.dp)
                 .chromeBezel(24.dp)
-                .padding(start = 18.dp, end = 18.dp, top = TAB_HEIGHT / 2 + 14.dp, bottom = 18.dp),
+                .padding(start = 22.dp, end = 22.dp, top = TAB_HEIGHT / 2 + 16.dp, bottom = 22.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             content = content,
         )
         ChromeTab(title, Modifier.align(Alignment.TopCenter).widthIn(max = 260.dp))
-        Box(Modifier.align(Alignment.TopEnd).padding(top = TAB_HEIGHT / 2 + 12.dp, end = 14.dp), content = corner)
+        Box(Modifier.align(Alignment.TopEnd).padding(top = TAB_HEIGHT / 2 + 16.dp, end = 18.dp), content = corner)
     }
 }

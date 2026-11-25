@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -44,6 +45,7 @@ private val CELL_SHAPE = RoundedCornerShape(3.dp)
 private val LEVEL_ALPHA = floatArrayOf(0f, 0.30f, 0.55f, 0.80f, 1f)
 private val DAY_LABELS = listOf("L", "M", "X", "J", "V", "S", "D")
 private val MONTH_FORMAT = DateTimeFormatter.ofPattern("MMM", Spanish)
+private val CELL_DATE = DateTimeFormatter.ofPattern("d 'de' MMMM", Spanish)
 
 fun levelColor(base: Color, level: Int): Color = base.copy(alpha = LEVEL_ALPHA[level.coerceIn(0, MAX_LEVEL)])
 
@@ -56,6 +58,7 @@ fun ContributionGraph(
     modifier: Modifier = Modifier,
 ) {
     val a = LocalAero.current
+    val todayRing = MaterialTheme.colorScheme.onSurface
     val today = LocalDate.now()
     val firstWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(WEEKS - 1L)
 
@@ -86,12 +89,14 @@ fun ContributionGraph(
                         val date = weekStart.plusDays(d)
                         val level = logs[date]?.intensity ?: 0
                         val cell = Modifier.size(CELL).clip(CELL_SHAPE)
-                        when {
-                            date.isAfter(today) -> Box(cell)
-                            else -> Box(
-                                (if (level == 0) cell.background(a.emptyCell).border(1.dp, a.emptyCellBorder, CELL_SHAPE)
-                                else cell.background(levelColor(color, level)))
-                                    .semantics { contentDescription = "$date, nivel $level" }
+                        if (date.isAfter(today)) {
+                            Box(cell)
+                        } else {
+                            val filled = if (level == 0) cell.background(a.emptyCell).border(1.dp, a.emptyCellBorder, CELL_SHAPE)
+                            else cell.background(levelColor(color, level))
+                            Box(
+                                (if (date == today) filled.border(1.5.dp, todayRing, CELL_SHAPE) else filled)
+                                    .semantics { contentDescription = "${CELL_DATE.format(date)}, nivel $level" }
                                     .clickable { onDayClick(date) },
                             )
                         }

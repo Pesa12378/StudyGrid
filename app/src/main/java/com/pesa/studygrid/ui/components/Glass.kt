@@ -116,14 +116,13 @@ half4 main(float2 coord) {
  * Liquid Glass panel: blurs and refracts the [LocalBackdrop] behind it, then adds tint, gloss and a rim light.
  * Only valid on content in the same window as the backdrop (not inside Dialogs).
  */
+private val GLASS_BLUR = 8.dp
+private val GLASS_BEVEL = 30.dp
+private val GLASS_DEPTH = 30.dp
+
 @Composable
-fun Modifier.glass(
-    cornerRadius: Dp = 24.dp,
-    tint: Color = LocalAero.current.glassTint,
-    blur: Dp = 8.dp,
-    bevel: Dp = 30.dp,
-    depth: Dp = 30.dp,
-): Modifier {
+fun Modifier.glass(cornerRadius: Dp = 24.dp): Modifier {
+    val tint = LocalAero.current.glassTint
     val backdrop = LocalBackdrop.current
     val layer = rememberGraphicsLayer()
     val shader = remember { RuntimeShader(LIQUID_GLASS_AGSL) }
@@ -135,9 +134,9 @@ fun Modifier.glass(
         .drawWithCache {
             shader.setFloatUniform("size", size.width, size.height)
             shader.setFloatUniform("radius", cornerRadius.toPx().coerceAtMost(size.minDimension / 2))
-            shader.setFloatUniform("bevel", bevel.toPx())
-            shader.setFloatUniform("depth", depth.toPx())
-            val blurPx = blur.toPx()
+            shader.setFloatUniform("bevel", GLASS_BEVEL.toPx())
+            shader.setFloatUniform("depth", GLASS_DEPTH.toPx())
+            val blurPx = GLASS_BLUR.toPx()
             val effect = RenderEffect.createChainEffect(
                 RenderEffect.createRuntimeShaderEffect(shader, "content"),
                 RenderEffect.createBlurEffect(blurPx, blurPx, Shader.TileMode.CLAMP),
@@ -274,9 +273,9 @@ fun GelButton(
     color: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(50),
     enabled: Boolean = true,
 ) {
+    val shape = RoundedCornerShape(50)
     val textColor = readableTextOn(color)
     Box(
         modifier
@@ -322,7 +321,7 @@ fun GlassDialog(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Un
                 .clip(shape)
                 .background(a.dialogBg)
                 .chromeBezel(28.dp)
-                .padding(26.dp),
+                .padding(30.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
             content = content,
         )
