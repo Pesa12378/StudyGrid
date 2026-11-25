@@ -91,7 +91,7 @@ fun LogEditorDialog(
                         Modifier
                             .size(46.dp)
                             .clip(shape)
-                            .background(if (l == 0) a.emptyCell else levelColor(color, l))
+                            .background(if (l == 0) a.emptyCell else levelColor(l))
                             .border(
                                 if (selected) 2.5.dp else 1.dp,
                                 if (selected) MaterialTheme.colorScheme.onSurface else a.emptyCellBorder,

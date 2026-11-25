@@ -29,3 +29,11 @@ SOFTWARE
 
 Background photo app/src/main/res/drawable-nodpi/bg_meadow.jpg (cropped and resized) is by Chris Barbalis on Unsplash
 (https://unsplash.com/photos/-nYBR0LFTvQ), used under the Unsplash License (https://unsplash.com/license).
+
+Additional background photos (cropped and resized), all used under the Unsplash License (https://unsplash.com/license):
+
+- bg_hills.jpg / widget_hills.jpg — Raisa Milova (https://unsplash.com/photos/EACiHThPgjQ)
+- bg_meadow_crest.jpg / widget_meadow_crest.jpg — Chris Barbalis (https://unsplash.com/photos/doicC_ATzkQ)
+- bg_sea.jpg / widget_sea.jpg — Linus Nylund (https://unsplash.com/photos/At_r0TuqL8o)
+- bg_pool.jpg / widget_pool.jpg — Dan Counsell (https://unsplash.com/photos/Ed0VVKliDsA)
+- bg_ripples.jpg / widget_ripples.jpg — Anna Sullivan (https://unsplash.com/photos/iUmoREuqGbo)

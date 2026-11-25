@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Static soap bubbles for the widget (widgets can't animate): clear center, bright rim, specular glint. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="400dp"
+    android:height="215dp"
+    android:viewportWidth="400"
+    android:viewportHeight="215">
+
+    <!-- big bubble, upper right -->
+    <path android:pathData="M352,46m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0"
+        android:strokeWidth="1.2" android:strokeColor="#B3FFFFFF">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="352" android:centerY="46" android:gradientRadius="30">
+                <item android:offset="0" android:color="#00FFFFFF" />
+                <item android:offset="0.7" android:color="#0DFFFFFF" />
+                <item android:offset="1" android:color="#59BFF3FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M332,32 A24,24 0 0 1 350,22" android:strokeWidth="3.5" android:strokeColor="#D9FFFFFF" android:strokeLineCap="round" />
+
+    <!-- small bubble, lower left -->
+    <path android:pathData="M22,186m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0"
+        android:strokeWidth="1" android:strokeColor="#B3FFFFFF">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="22" android:centerY="186" android:gradientRadius="14">
+                <item android:offset="0" android:color="#00FFFFFF" />
+                <item android:offset="1" android:color="#59BFF3FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M13,180 A11,11 0 0 1 21,175" android:strokeWidth="2" android:strokeColor="#D9FFFFFF" android:strokeLineCap="round" />
+
+    <!-- tiny bubbles -->
+    <path android:pathData="M300,192m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" android:strokeWidth="0.8" android:strokeColor="#B3FFFFFF" android:fillColor="#1AFFFFFF" />
+    <path android:pathData="M296,188 A5,5 0 0 1 300,186" android:strokeWidth="1.4" android:strokeColor="#E6FFFFFF" android:strokeLineCap="round" />
+    <path android:pathData="M385,150m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" android:strokeWidth="0.8" android:strokeColor="#B3FFFFFF" android:fillColor="#1AFFFFFF" />
+    <path android:pathData="M210,14m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" android:strokeWidth="0.8" android:strokeColor="#99FFFFFF" android:fillColor="#14FFFFFF" />
+</vector>

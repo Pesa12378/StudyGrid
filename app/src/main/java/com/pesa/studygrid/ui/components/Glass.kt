@@ -71,6 +71,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import com.pesa.studygrid.R
 import com.pesa.studygrid.ui.theme.LocalAero
+import android.graphics.BitmapFactory
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.graphics.asImageBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -168,6 +175,28 @@ private const val BUBBLE_FRAME_SECONDS = 1f / 30f
 /** x: 0..1 of width; speed: screen heights per second; r: radius as fraction of width; phase: 0..1 start offset. */
 private class Bubble(val x: Float, val speed: Float, val r: Float, val phase: Float, val wobble: Float)
 
+private val BACKGROUNDS = intArrayOf(
+    R.drawable.bg_meadow, R.drawable.bg_hills, R.drawable.bg_meadow_crest,
+    R.drawable.bg_sea, R.drawable.bg_pool, R.drawable.bg_ripples,
+)
+private const val SLIDE_SECONDS = 40f
+private const val FADE_SECONDS = 3f
+
+private class Slide(val slot: Int, val current: ImageBitmap, val next: ImageBitmap)
+
+/** ContentScale.Crop by hand: cover the canvas, centered. */
+private fun DrawScope.drawCover(img: ImageBitmap, alpha: Float) {
+    val scale = maxOf(size.width / img.width, size.height / img.height)
+    val dw = (img.width * scale).toInt()
+    val dh = (img.height * scale).toInt()
+    drawImage(
+        img,
+        dstOffset = IntOffset(((size.width - dw) / 2).toInt(), ((size.height - dh) / 2).toInt()),
+        dstSize = IntSize(dw, dh),
+        alpha = alpha,
+    )
+}
+
 private val FILM = listOf(Color(0xFFFF6EC7), Color(0xFFFFE66D), Color(0xFF6EF0FF), Color(0xFFA78BFA), Color(0xFFFF6EC7))
     .map { it.copy(alpha = 0.30f) }
 
@@ -175,7 +204,6 @@ private val FILM = listOf(Color(0xFFFF6EC7), Color(0xFFFFE66D), Color(0xFF6EF0FF
 @Composable
 fun AeroBackground(modifier: Modifier = Modifier) {
     val a = LocalAero.current
-    val photo = ImageBitmap.imageResource(R.drawable.bg_meadow)
     val bubbles = remember {
         val rnd = Random(42)
         List(18) {
@@ -197,14 +225,27 @@ fun AeroBackground(modifier: Modifier = Modifier) {
             }
         }
     }
+    // Photo slideshow: each day starts on a different photo; only the current and next are decoded (off the main thread).
+    val start = remember { LocalDate.now().dayOfYear }
+    val slot by remember { derivedStateOf { (time / SLIDE_SECONDS).toInt() } }
+    val slide by produceState<Slide?>(null, slot) {
+        val res = context.resources
+        fun load(i: Int) = BitmapFactory.decodeResource(res, BACKGROUNDS[(start + i) % BACKGROUNDS.size]).asImageBitmap()
+        val prev = value
+        value = withContext(Dispatchers.IO) {
+            Slide(slot, if (prev?.slot == slot - 1) prev.next else load(slot), load(slot + 1))
+        }
+    }
     Canvas(modifier) {
         val w = size.width
         val h = size.height
-        // ContentScale.Crop by hand: cover the canvas, centered.
-        val scale = maxOf(w / photo.width, h / photo.height)
-        val dw = (photo.width * scale).toInt()
-        val dh = (photo.height * scale).toInt()
-        drawImage(photo, dstOffset = IntOffset(((w - dw) / 2).toInt(), ((h - dh) / 2).toInt()), dstSize = IntSize(dw, dh))
+        slide?.let { s ->
+            drawCover(s.current, 1f)
+            // Fade into the next photo during the slot's last seconds; timed against the slot this pair was loaded for,
+            // so a late load never snaps back to the previous photo.
+            val fade = ((time - s.slot * SLIDE_SECONDS - (SLIDE_SECONDS - FADE_SECONDS)) / FADE_SECONDS).coerceIn(0f, 1f)
+            if (fade > 0f) drawCover(s.next, fade)
+        }
         drawRect(a.scrim)
 
         for (b in bubbles) {

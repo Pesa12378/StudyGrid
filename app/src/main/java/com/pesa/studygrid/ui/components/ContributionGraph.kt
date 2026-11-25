@@ -42,19 +42,21 @@ private val CELL = 14.dp
 private val GAP = 3.dp
 private val MONTH_ROW = 16.dp
 private val CELL_SHAPE = RoundedCornerShape(3.dp)
-// Level 1 at 0.30 blended into the day-mode empty cell on the light panel; 0.50 keeps it distinct, steps stay increasing.
-private val LEVEL_ALPHA = floatArrayOf(0f, 0.50f, 0.68f, 0.84f, 1f)
+// Distinct hue per level from the original palette, ordered cool -> hot so "more effort" reads as "warmer":
+// 1 cyan, 2 blue, 3 purple, 4 orange. Index 0 (no activity) is drawn as an empty cell by callers.
+private val LEVEL_COLORS = listOf(
+    Color.Transparent, Color(0xFF39C5CF), Color(0xFF2F81F7), Color(0xFFA371F7), Color(0xFFF78166),
+)
 private val DAY_LABELS = listOf("L", "M", "X", "J", "V", "S", "D")
 private val MONTH_FORMAT = DateTimeFormatter.ofPattern("MMM", Spanish)
 private val CELL_DATE = DateTimeFormatter.ofPattern("d 'de' MMMM", Spanish)
 
-fun levelColor(base: Color, level: Int): Color = base.copy(alpha = LEVEL_ALPHA[level.coerceIn(0, MAX_LEVEL)])
+fun levelColor(level: Int): Color = LEVEL_COLORS[level.coerceIn(0, MAX_LEVEL)]
 
 /** 26 weeks x 7 days (Mon..Sun), newest week on the right; starts scrolled to the right end. */
 @Composable
 fun ContributionGraph(
     logs: Map<LocalDate, DailyLogEntity>,
-    color: Color,
     onDayClick: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -94,7 +96,7 @@ fun ContributionGraph(
                             Box(cell)
                         } else {
                             val filled = if (level == 0) cell.background(a.emptyCell).border(1.dp, a.emptyCellBorder, CELL_SHAPE)
-                            else cell.background(levelColor(color, level))
+                            else cell.background(levelColor(level))
                             Box(
                                 (if (date == today) filled.border(1.5.dp, todayRing, CELL_SHAPE) else filled)
                                     .semantics { contentDescription = "${CELL_DATE.format(date)}, nivel $level" }

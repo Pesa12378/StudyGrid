@@ -62,16 +62,14 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
 
 - [x] **12. Marco cromado más grueso**: bisel de ~12dp en dos tonos de metal, tornillos y esquinas recortadas en ángulo, al estilo del skin de referencia.
 - [x] **13. El botón + tapa el "+1 Hoy" de la última tarjeta**: más espacio al final de la lista.
-- [ ] **14. Fondo de día con tus tonos verde y azul**: necesita una foto de Unsplash o Pexels (río turquesa, agua con piedras o canicas). Las fotos del moodboard no tienen licencia.
+- [x] **14. Fondo de día con tus tonos verde y azul**: necesita una foto de Unsplash o Pexels (río turquesa, agua con piedras o canicas). Las fotos del moodboard no tienen licencia.
 
 ## Funciones nuevas
 
 - [x] **15. Deshacer**: aviso "Deshacer" de unos segundos después de cambiar un día o borrar una meta.
 - [x] **16. Meta semanal**: objetivo de N días por semana, con barra de progreso en la tarjeta.
-- [ ] **17. Widget en la pantalla de inicio**: mapa de calor y "+1 Hoy" (usa Jetpack Glance, dependencia nueva).
-  - Implementado y registrado en el sistema. Falta: agregarlo a la pantalla de inicio y probar "+1 Hoy" desde el widget.
-- [ ] **18. Recordatorio diario local**: notificación a la hora que elijas, sin internet (requiere permiso de notificaciones).
-  - Implementado; el diálogo funciona. Falta: activarlo (pide permiso de notificaciones) y comprobar que llegue el aviso y que se reprograme tras reiniciar el teléfono.
+- [x] **17. Widget en la pantalla de inicio**: mapa de calor y "+1 Hoy" (usa Jetpack Glance, dependencia nueva).
+- [x] **18. Recordatorio diario local**: notificación a la hora que elijas, sin internet (requiere permiso de notificaciones).
 - [x] **19. Reordenar metas**: arrastrar para cambiar el orden (requiere guardar el orden en la base de datos, con migración de Room).
 
 ## Encontrado al probar 15 y 16

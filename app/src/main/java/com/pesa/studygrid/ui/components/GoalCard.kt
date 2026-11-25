@@ -90,7 +90,7 @@ fun GoalCard(
                 .border(1.dp, Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.35f), Color.White.copy(alpha = 0.6f))), panel)
                 .padding(10.dp),
         ) {
-            ContributionGraph(ui.logs, color, onDayClick)
+            ContributionGraph(ui.logs, onDayClick)
         }
 
         // "+1 Hoy" sits on the left so the bottom-right FAB never covers it while scrolling.
