@@ -45,23 +45,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pesa.studygrid.data.GoalEntity
 import com.pesa.studygrid.ui.StudyViewModel
 import com.pesa.studygrid.ui.components.AeroBackground
+import com.pesa.studygrid.ui.components.ChromeRoundButton
 import com.pesa.studygrid.ui.components.ConfirmDialog
 import com.pesa.studygrid.ui.components.DeleteGoalDialog
 import com.pesa.studygrid.ui.components.GoalCard
 import com.pesa.studygrid.ui.components.GoalEditorDialog
 import com.pesa.studygrid.ui.components.LogEditorDialog
 import com.pesa.studygrid.ui.components.glass
-import com.pesa.studygrid.ui.theme.Aqua
 import com.pesa.studygrid.ui.theme.LocalAero
 import com.pesa.studygrid.R
 import com.pesa.studygrid.ui.components.LocalBackdrop
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
 import java.time.LocalDate
 
 private sealed interface GoalDialog {
@@ -137,14 +135,8 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                     )
                 },
                 floatingActionButton = {
-                    Box(
-                        Modifier
-                            .size(66.dp)
-                            .glass(cornerRadius = 33.dp, tint = Aqua.copy(alpha = 0.30f), bevel = 18.dp, depth = 14.dp)
-                            .clickable(role = Role.Button) { goalDialog = GoalDialog.New },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(Icons.Filled.Add, "Nueva meta", tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(30.dp))
+                    ChromeRoundButton(onClick = { goalDialog = GoalDialog.New }, contentDescription = "Nueva meta", size = 66.dp) {
+                        Icon(Icons.Filled.Add, contentDescription = null, tint = Color.White, modifier = Modifier.size(30.dp))
                     }
                 },
                 snackbarHost = { SnackbarHost(snackbar) },

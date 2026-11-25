@@ -83,10 +83,8 @@ fun GoalEditorDialog(initial: GoalEntity?, onSave: (GoalEntity) -> Unit, onDelet
             }
             TextButton(onClick = onDismiss) { Text("Cancelar") }
             Spacer(Modifier.width(8.dp))
-            GelButton("Guardar", Color(color), onClick = {
-                if (title.isNotBlank()) {
-                    onSave((initial ?: GoalEntity(title = "", color = color)).copy(title = title.trim(), description = description.trim(), color = color))
-                }
+            GelButton("Guardar", Color(color), enabled = title.isNotBlank(), onClick = {
+                onSave((initial ?: GoalEntity(title = "", color = color)).copy(title = title.trim(), description = description.trim(), color = color))
             })
         }
     }

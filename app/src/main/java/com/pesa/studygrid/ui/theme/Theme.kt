@@ -32,6 +32,12 @@ data class AeroColors(
     val emptyCellBorder: Color,
     val dialogBg: Color,
     val muted: Color,
+    /** Metal bezel gradient, top to bottom. */
+    val chrome: List<Color>,
+    /** Glossy center of round chrome buttons (light, deep). */
+    val accent: Color,
+    val accentDeep: Color,
+    val tabText: Color,
 )
 
 private val DarkAero = AeroColors(
@@ -44,18 +50,33 @@ private val DarkAero = AeroColors(
     emptyCellBorder = Color.White.copy(alpha = 0.12f),
     dialogBg = Color(0xFF0E2236).copy(alpha = 0.85f),
     muted = Color(0xFF9CC0DD),
+    chrome = listOf(Color(0xFFDCE8F5), Color(0xFF6F8BA8), Color(0xFFB9CCE0), Color(0xFF2F4660), Color(0xFF9FB6CF)),
+    accent = Color(0xFF6FB6FF),
+    accentDeep = Color(0xFF1F4FA8),
+    tabText = Color(0xFF0B1E33),
 )
 
+// Day palette sampled from the user's "Green and Blue" moodboard (turquoise water, jade, teal, marble blue).
+private val Turquoise = Color(0xFF03AAB1)
+private val PaleAqua = Color(0xFF8DEDF2)
+private val Jade = Color(0xFF4FAA92)
+private val DeepTeal = Color(0xFF026B72)
+private val AbyssTeal = Color(0xFF0E504F)
+
 private val LightAero = AeroColors(
-    scrim = Color.White.copy(alpha = 0.10f),
-    glassTint = Color.White.copy(alpha = 0.22f),
+    scrim = Turquoise.copy(alpha = 0.16f),
+    glassTint = Color(0xFFE6FAF7).copy(alpha = 0.32f),
     borderTop = Color.White.copy(alpha = 0.95f),
-    borderBottom = Color.White.copy(alpha = 0.30f),
-    graphPanel = Color.White.copy(alpha = 0.55f),
-    emptyCell = Color(0xFF0B2A45).copy(alpha = 0.08f),
-    emptyCellBorder = Color(0xFF0B2A45).copy(alpha = 0.14f),
-    dialogBg = Color.White.copy(alpha = 0.85f),
-    muted = Color(0xFF2F4F68),
+    borderBottom = PaleAqua.copy(alpha = 0.40f),
+    graphPanel = Color(0xFFE9FBF7).copy(alpha = 0.62f),
+    emptyCell = AbyssTeal.copy(alpha = 0.09f),
+    emptyCellBorder = AbyssTeal.copy(alpha = 0.17f),
+    dialogBg = Color(0xFFF1FCFA).copy(alpha = 0.90f),
+    muted = Color(0xFF1A5C5A),
+    chrome = listOf(Color(0xFFF2FBF9), Color(0xFF8FC9C1), Color(0xFFE1F4F0), Color(0xFF2F7F7A), Color(0xFFBFE6DF)),
+    accent = Jade,
+    accentDeep = DeepTeal,
+    tabText = AbyssTeal,
 )
 
 val LocalAero = staticCompositionLocalOf { DarkAero }
@@ -71,10 +92,10 @@ fun StudyGridTheme(dark: Boolean, content: @Composable () -> Unit) {
         )
     } else {
         lightColorScheme(
-            primary = Color(0xFF0B7FC2), onPrimary = Color.White,
-            background = Color(0xFFEAF8FF), surface = Color.White,
-            surfaceContainer = Color(0xFFF4FBFF), onSurface = Color(0xFF0B2A45),
-            onSurfaceVariant = Color(0xFF4A6B85), outline = Color(0xFF0B2A45).copy(alpha = 0.3f),
+            primary = Color(0xFF038C94), onPrimary = Color.White,
+            background = Color(0xFFE9FBF7), surface = Color.White,
+            surfaceContainer = Color(0xFFF1FCFA), onSurface = Color(0xFF0B3B3A),
+            onSurfaceVariant = Color(0xFF1A5C5A), outline = AbyssTeal.copy(alpha = 0.3f),
         )
     }
     MaterialTheme(colorScheme = scheme) {

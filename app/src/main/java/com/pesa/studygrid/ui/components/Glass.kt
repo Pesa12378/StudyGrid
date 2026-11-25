@@ -164,6 +164,8 @@ fun Modifier.glass(
         }
 }
 
+private const val BUBBLE_FRAME_SECONDS = 1f / 30f
+
 /** x: 0..1 of width; speed: screen heights per second; r: radius as fraction of width; phase: 0..1 start offset. */
 private class Bubble(val x: Float, val speed: Float, val r: Float, val phase: Float, val wobble: Float)
 
@@ -189,7 +191,11 @@ fun AeroBackground(modifier: Modifier = Modifier) {
     if (animate) {
         LaunchedEffect(Unit) {
             val start = withFrameNanos { it }
-            while (true) withFrameNanos { time = (it - start) / 1_000_000_000f }
+            while (true) withFrameNanos { now ->
+                // Bubbles move < 1px per frame: redraw at ~30 fps instead of the display's 120 Hz to save battery.
+                val t = (now - start) / 1_000_000_000f
+                if (t - time >= BUBBLE_FRAME_SECONDS) time = t
+            }
         }
     }
     Canvas(modifier) {
@@ -249,6 +255,18 @@ private fun DrawScope.soapBubble(c: Offset, r: Float, t: Float) {
     )
 }
 
+private val DarkText = Color(0xFF06121F)
+
+private fun contrast(a: Color, b: Color): Float {
+    val la = a.luminance() + 0.05f
+    val lb = b.luminance() + 0.05f
+    return maxOf(la, lb) / minOf(la, lb)
+}
+
+/** White or dark text, whichever has the higher WCAG contrast on [background]. */
+internal fun readableTextOn(background: Color): Color =
+    if (contrast(background, Color.White) >= contrast(background, DarkText)) Color.White else DarkText
+
 /** Glossy "gel" button: color gradient with a specular highlight on the upper half. */
 @Composable
 fun GelButton(
@@ -259,7 +277,7 @@ fun GelButton(
     shape: Shape = RoundedCornerShape(50),
     enabled: Boolean = true,
 ) {
-    val textColor = if (color.luminance() > 0.45f) Color(0xFF06121F) else Color.White
+    val textColor = readableTextOn(color)
     Box(
         modifier
             .alpha(if (enabled) 1f else 0.4f)
@@ -303,8 +321,8 @@ fun GlassDialog(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Un
                 .fillMaxWidth()
                 .clip(shape)
                 .background(a.dialogBg)
-                .border(1.dp, Brush.verticalGradient(listOf(a.borderTop, a.borderBottom)), shape)
-                .padding(20.dp),
+                .chromeBezel(28.dp)
+                .padding(26.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
             content = content,
         )
