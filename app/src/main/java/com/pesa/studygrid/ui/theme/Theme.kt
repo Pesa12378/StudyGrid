@@ -1,0 +1,88 @@
+package com.pesa.studygrid.ui.theme
+
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+
+val Aqua = Color(0xFF2BD9FE)
+val Lime = Color(0xFF7AE582)
+val Sky = Color(0xFF4FA3FF)
+val Violet = Color(0xFFB48CFF)
+val Coral = Color(0xFFFF8A65)
+
+/** Goal color choices, stored as ARGB ints. */
+val GoalPalette = listOf(Aqua, Lime, Sky, Violet, Coral)
+
+/** Aero-specific tokens Material's ColorScheme has no slot for. */
+@Immutable
+data class AeroColors(
+    /** Laid over the background photo: darkens it to "night" in dark mode, softens it in light mode. */
+    val scrim: Color,
+    val glassTint: Color,
+    val borderTop: Color,
+    val borderBottom: Color,
+    val graphPanel: Color,
+    val emptyCell: Color,
+    val emptyCellBorder: Color,
+    val dialogBg: Color,
+    val muted: Color,
+)
+
+private val DarkAero = AeroColors(
+    scrim = Color(0xFF041322).copy(alpha = 0.62f),
+    glassTint = Color.White.copy(alpha = 0.08f),
+    borderTop = Color.White.copy(alpha = 0.35f),
+    borderBottom = Color.White.copy(alpha = 0.05f),
+    graphPanel = Color(0xFF0A1A2B).copy(alpha = 0.62f),
+    emptyCell = Color.White.copy(alpha = 0.07f),
+    emptyCellBorder = Color.White.copy(alpha = 0.12f),
+    dialogBg = Color(0xFF0E2236).copy(alpha = 0.85f),
+    muted = Color(0xFF9CC0DD),
+)
+
+private val LightAero = AeroColors(
+    scrim = Color.White.copy(alpha = 0.10f),
+    glassTint = Color.White.copy(alpha = 0.22f),
+    borderTop = Color.White.copy(alpha = 0.95f),
+    borderBottom = Color.White.copy(alpha = 0.30f),
+    graphPanel = Color.White.copy(alpha = 0.55f),
+    emptyCell = Color(0xFF0B2A45).copy(alpha = 0.08f),
+    emptyCellBorder = Color(0xFF0B2A45).copy(alpha = 0.14f),
+    dialogBg = Color.White.copy(alpha = 0.85f),
+    muted = Color(0xFF2F4F68),
+)
+
+val LocalAero = staticCompositionLocalOf { DarkAero }
+
+@Composable
+fun StudyGridTheme(dark: Boolean, content: @Composable () -> Unit) {
+    val scheme = if (dark) {
+        darkColorScheme(
+            primary = Aqua, onPrimary = Color(0xFF06121F),
+            background = Color(0xFF06121F), surface = Color(0xFF0E2236),
+            surfaceContainer = Color(0xFF10263C), onSurface = Color(0xFFE6F1FF),
+            onSurfaceVariant = Color(0xFF8FB3D1), outline = Color.White.copy(alpha = 0.3f),
+        )
+    } else {
+        lightColorScheme(
+            primary = Color(0xFF0B7FC2), onPrimary = Color.White,
+            background = Color(0xFFEAF8FF), surface = Color.White,
+            surfaceContainer = Color(0xFFF4FBFF), onSurface = Color(0xFF0B2A45),
+            onSurfaceVariant = Color(0xFF4A6B85), outline = Color(0xFF0B2A45).copy(alpha = 0.3f),
+        )
+    }
+    MaterialTheme(colorScheme = scheme) {
+        // Transparent surfaces (Scaffold, dialogs) don't set a content color; default it here.
+        CompositionLocalProvider(
+            LocalAero provides if (dark) DarkAero else LightAero,
+            LocalContentColor provides scheme.onSurface,
+            content = content,
+        )
+    }
+}
