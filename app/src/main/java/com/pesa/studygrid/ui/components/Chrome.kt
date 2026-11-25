@@ -12,6 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -206,5 +211,26 @@ fun ChromeCard(
         )
         ChromeTab(title, Modifier.align(Alignment.TopCenter).widthIn(max = 260.dp))
         Box(Modifier.align(Alignment.TopEnd).padding(top = TAB_HEIGHT / 2 + 16.dp, end = 18.dp), content = corner)
+    }
+}
+
+/** Aviso (snackbar) con el estilo cromado de la app. */
+@Composable
+fun ChromeSnackbar(data: SnackbarData) {
+    val aero = LocalAero.current
+    val shape = RoundedCornerShape(20.dp)
+    Row(
+        Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .clip(shape)
+            .background(aero.dialogBg)
+            .chromeBezel(20.dp)
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(data.visuals.message, Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurface)
+        data.visuals.actionLabel?.let { GelButton(it, aero.accent, onClick = { data.performAction() }) }
     }
 }

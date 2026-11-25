@@ -42,7 +42,8 @@ private val CELL = 14.dp
 private val GAP = 3.dp
 private val MONTH_ROW = 16.dp
 private val CELL_SHAPE = RoundedCornerShape(3.dp)
-private val LEVEL_ALPHA = floatArrayOf(0f, 0.30f, 0.55f, 0.80f, 1f)
+// Level 1 at 0.30 blended into the day-mode empty cell on the light panel; 0.50 keeps it distinct, steps stay increasing.
+private val LEVEL_ALPHA = floatArrayOf(0f, 0.50f, 0.68f, 0.84f, 1f)
 private val DAY_LABELS = listOf("L", "M", "X", "J", "V", "S", "D")
 private val MONTH_FORMAT = DateTimeFormatter.ofPattern("MMM", Spanish)
 private val CELL_DATE = DateTimeFormatter.ofPattern("d 'de' MMMM", Spanish)

@@ -74,5 +74,5 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
 
 ## Encontrado al probar 15 y 16
 
-- [ ] **20. El nivel 1 casi no se ve en modo día**: un cuadrito con nivel 1 (aqua al 30%) se confunde con uno vacío sobre el panel claro. Subir la opacidad mínima o usar un tono más oscuro en día.
-- [ ] **21. El aviso de "Deshacer" no usa el estilo de la app**: sale con el estilo por defecto de Material (gris oscuro con botón morado). Darle el marco cromado y los colores del tema.
+- [x] **20. El nivel 1 casi no se ve en modo día**: un cuadrito con nivel 1 (aqua al 30%) se confunde con uno vacío sobre el panel claro. Subir la opacidad mínima o usar un tono más oscuro en día.
+- [x] **21. El aviso de "Deshacer" no usa el estilo de la app**: sale con el estilo por defecto de Material (gris oscuro con botón morado). Darle el marco cromado y los colores del tema.

@@ -46,6 +46,7 @@ import com.pesa.studygrid.data.GoalEntity
 import com.pesa.studygrid.ui.StudyViewModel
 import com.pesa.studygrid.ui.components.AeroBackground
 import com.pesa.studygrid.ui.components.ChromeRoundButton
+import com.pesa.studygrid.ui.components.ChromeSnackbar
 import com.pesa.studygrid.ui.components.ConfirmDialog
 import com.pesa.studygrid.ui.components.DeleteGoalDialog
 import com.pesa.studygrid.ui.components.GoalCard
@@ -153,7 +154,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                         Icon(Icons.Filled.Add, contentDescription = null, tint = Color.White, modifier = Modifier.size(30.dp))
                     }
                 },
-                snackbarHost = { SnackbarHost(snackbar) },
+                snackbarHost = { SnackbarHost(snackbar) { ChromeSnackbar(it) } },
             ) { padding ->
                 val list = goals
                 when {
