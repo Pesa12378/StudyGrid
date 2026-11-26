@@ -1,4 +1,6 @@
-# StudyGrid — Pendientes
+# Habitum Aqua — Pendientes
+
+App antes llamada StudyGrid (el paquete `com.pesa.studygrid` no cambia).
 
 Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; marca `[x]` al terminar y probar en el teléfono.
 
@@ -36,9 +38,10 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
   - Problema: es fácil tocar el día de al lado y registrar la fecha equivocada.
   - Arreglo: flechas ‹ › en el diálogo del día para moverse al día anterior o siguiente (sin pasar de hoy).
 
-- [ ] **7. TalkBack no anuncia qué nivel o color está elegido**
+- [x] **7. TalkBack no anuncia qué nivel o color está elegido**
   - Dónde: [LogEditorDialog.kt](app/src/main/java/com/pesa/studygrid/ui/components/LogEditorDialog.kt) (chips 0–4), [GoalEditorDialog.kt](app/src/main/java/com/pesa/studygrid/ui/components/GoalEditorDialog.kt) (círculos de color)
   - Arreglo: cambiar `clickable` por `selectable(selected = …, role = Role.RadioButton)`.
+  - Hecho: ambos usan `selectable(selected, role = Role.RadioButton)` con `contentDescription` ("Nivel 2, Medio", "Color aqua"). Falta probarlo con TalkBack en el teléfono.
 
 ## Estaría bien
 
@@ -46,9 +49,10 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
   - Dónde: [ContributionGraph.kt](app/src/main/java/com/pesa/studygrid/ui/components/ContributionGraph.kt)
   - Arreglo: borde brillante en la celda de hoy.
 
-- [ ] **9. La pantalla vacía no tiene el marco cromado**
+- [x] **9. La pantalla vacía no tiene el marco cromado**
   - Dónde: [MainScreen.kt](app/src/main/java/com/pesa/studygrid/ui/screens/MainScreen.kt) → `EmptyState`
   - Arreglo: usar el mismo `chromeBezel` que las tarjetas.
+  - Hecho: `chromeBezel` se reemplazó por `GlassFrame.kt`; `EmptyState` ya usa `glass().glassRim(24.dp)` como las tarjetas.
 
 - [x] **10. Colores del tema sin uso**
   - Dónde: [Theme.kt](app/src/main/java/com/pesa/studygrid/ui/theme/Theme.kt) → `borderTop`, `borderBottom`
@@ -88,6 +92,65 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
 ## Antes de publicar
 
 - [ ] **27. Llave de firma propia**: la release está firmada con la llave local de pruebas (`signingConfig = debug`). Crear un keystore propio, guardarlo fuera de git y respaldarlo; si se pierde, no se puede actualizar la app.
+
+## Próximo (ver ROADMAP.md)
+
+Detalle, archivos y criterios de aceptación de cada tarea en [ROADMAP.md](ROADMAP.md). Se hacen en orden.
+
+### Fase 0 — Base: Ajustes, motor de temas, accesibilidad
+- [ ] **0.1** Pantalla de Ajustes y navegación mínima (M)
+- [ ] **0.2** Calendario de temas, lógica pura + tests (S)
+- [ ] **0.3** `ThemeSpec` y `StudyGridTheme` con tema (M)
+- [ ] **0.4** Fondo y partículas por tema (M)
+- [ ] **0.5** Reducir movimiento y reducir transparencia (M)
+- [ ] **0.6** Selector de tema en Ajustes (S)
+
+### Fase 1 — Temas de temporada
+- [ ] **1.1** Jolly / Navidad, 1–30 dic (M)
+- [ ] **1.2** Año Nuevo, 31 dic – 1 ene (M)
+- [ ] **1.3** Dark Aero, manual (S)
+- [ ] **1.4** Aurora, 2 ene – feb (L)
+- [ ] **1.5** Gen X Soft Club y DORFic, manuales (S)
+- [ ] **1.6** Eco, mar – abr (M)
+- [ ] **1.7** Vectorgarden, may (M)
+- [ ] **1.8** Aqua, jun – ago (L)
+- [ ] **1.9** Halloween, 25 – 31 oct (M)
+- [ ] **1.10** Día de Muertos, 1 – 2 nov (M)
+- [ ] **1.11** El widget sigue el tema (S)
+
+### Fase 2 — Rachas flexibles y celebración
+- [ ] **2.1** Rachas con frecuencia, lógica pura (M)
+- [ ] **2.2** Comodines de racha, lógica pura (S)
+- [ ] **2.3** Migración Room v4 + editor de frecuencia (M)
+- [ ] **2.4** Mostrar comodines y días no programados (S)
+- [ ] **2.5** Celebración "pop" al dar +1 (M)
+- [ ] **2.6** Sonidos sintetizados, apagados por defecto (M)
+
+### Fase 3 — Acuario MVP
+- [ ] **3.1** Economía, lógica pura + tests (M)
+- [ ] **3.2** Room v5: tablas del juego (M)
+- [ ] **3.3** Premios desde el registro de hábitos (M)
+- [ ] **3.4** Respaldo JSON v2 (M)
+- [ ] **3.5** Arte de los peces (M)
+- [ ] **3.6** Pantalla del acuario (L)
+- [ ] **3.7** Cuidado: alimentar y gotas (M)
+
+### Fase 4 — Tienda y cosméticos
+- [ ] **4.1** Catálogo y compra (S)
+- [ ] **4.2** Diálogo de tienda (M)
+- [ ] **4.3** Temas desbloqueables (S)
+- [ ] **4.4** Decoraciones del acuario (M)
+- [ ] **4.5** Paquetes de sonido (S)
+- [ ] **4.6** Íconos alternativos de la app (M)
+
+### Fase 5 — Utilidades
+- [ ] **5.1** Migración Room v6: archivar, recordatorio por meta, minutos (M)
+- [ ] **5.2** Archivar metas (S)
+- [ ] **5.3** Recordatorio por meta (M)
+- [ ] **5.4** Vista anual (M)
+- [ ] **5.5** Temporizador de enfoque, lógica pura (S)
+- [ ] **5.6** Burbuja de enfoque, UI + notificación (L)
+- [ ] **5.7** Bloqueo con biometría (M)
 
 ## Para seguir en otra computadora
 

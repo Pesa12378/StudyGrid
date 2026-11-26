@@ -124,7 +124,7 @@ fun StatsDialog(
                         val bmp = layer.toImageBitmap().asAndroidBitmap()
                         val uri = withContext(Dispatchers.IO) {
                             val dir = File(context.cacheDir, "shared").apply { mkdirs() }
-                            val f = File(dir, "studygrid-" + goalTitle.replace(Regex("[^\\p{L}\\p{N}]+"), "_").take(40) + ".png")
+                            val f = File(dir, "habitum-" + goalTitle.replace(Regex("[^\\p{L}\\p{N}]+"), "_").take(40) + ".png")
                             f.outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
                             FileProvider.getUriForFile(context, context.packageName + ".fileprovider", f)
                         }

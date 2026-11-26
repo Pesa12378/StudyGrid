@@ -186,7 +186,7 @@ private fun Content(data: WidgetData?, loaded: Boolean, today: LocalDate, t: Wid
         if (data == null) {
             if (loaded) Box(GlanceModifier.fillMaxSize().padding(OUTER), contentAlignment = Alignment.Center) {
                 Box(GlanceModifier.background(ImageProvider(t.panel)).padding(14.dp)) {
-                    Text("Primero crea una meta en la app StudyGrid.", style = TextStyle(color = ColorProvider(t.title), fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                    Text("Primero crea una meta en la app Habitum Aqua.", style = TextStyle(color = ColorProvider(t.title), fontSize = 14.sp, fontWeight = FontWeight.Bold))
                 }
             }
         } else {

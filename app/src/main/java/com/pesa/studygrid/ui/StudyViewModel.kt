@@ -160,7 +160,7 @@ class StudyViewModel(app: Application) : AndroidViewModel(app) {
         }.onSuccess { _messages.send(UiMessage("Respaldo importado")) }
             .onFailure {
                 Log.w("StudyViewModel", "import failed", it)
-                _messages.send(UiMessage("No se pudo leer el archivo. Elige un respaldo de StudyGrid."))
+                _messages.send(UiMessage("No se pudo leer el archivo. Elige un respaldo de Habitum Aqua."))
             }
     }
 }

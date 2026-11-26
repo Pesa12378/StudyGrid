@@ -9,7 +9,7 @@
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="StudyGrid"
+        android:label="Habitum Aqua"
         android:theme="@style/Theme.StudyGrid">
         <activity
             android:name=".MainActivity"
@@ -53,7 +53,7 @@
         <receiver
             android:name=".widget.StudyGridWidgetReceiver"
             android:exported="true"
-            android:label="StudyGrid">
+            android:label="Habitum Aqua">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

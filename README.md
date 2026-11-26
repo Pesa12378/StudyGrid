@@ -1,6 +1,7 @@
-# StudyGrid
+# Habitum Aqua
+Un rastreador de hábitos de estilo Frutiger Aero.
 
-App de Android para seguir metas de estudio diarias con un **gráfico de contribuciones estilo GitHub**. Funciona 100% offline, sin cuentas, sin anuncios y sin telemetría.
+App de Android para seguir metas y hábitos diarios con un **gráfico de contribuciones estilo GitHub**. Funciona 100% offline, sin cuentas, sin anuncios y sin telemetría.
 
 La interfaz mezcla **Frutiger Aero** (cielo, pasto, burbujas de jabón, botones "gel") con **Liquid Glass**: paneles de vidrio que desenfocan y refractan lo que tienen detrás mediante un shader AGSL.
 

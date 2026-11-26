@@ -132,7 +132,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                 contentColor = MaterialTheme.colorScheme.onSurface,
                 topBar = {
                     TopAppBar(
-                        title = { Text("StudyGrid", fontWeight = FontWeight.Bold, style = androidx.compose.material3.LocalTextStyle.current.copy(shadow = androidx.compose.ui.graphics.Shadow(Color.Black.copy(alpha = 0.35f), androidx.compose.ui.geometry.Offset(0f, 2f), 4f))) },
+                        title = { Text("Habitum Aqua", fontWeight = FontWeight.Bold, style = androidx.compose.material3.LocalTextStyle.current.copy(shadow = androidx.compose.ui.graphics.Shadow(Color.Black.copy(alpha = 0.35f), androidx.compose.ui.geometry.Offset(0f, 2f), 4f))) },
                         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                         actions = {
                             IconButton(onClick = onToggleDark) {
@@ -148,7 +148,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                                         text = { Text("Exportar respaldo (.json)") },
                                         onClick = {
                                             menuOpen = false
-                                            exportLauncher.launch("studygrid-respaldo-${LocalDate.now()}.json")
+                                            exportLauncher.launch("habitum-respaldo-${LocalDate.now()}.json")
                                         },
                                     )
                                     HorizontalDivider()

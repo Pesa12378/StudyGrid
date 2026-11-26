@@ -52,7 +52,7 @@ class WidgetConfigActivity : ComponentActivity() {
                     val list = goals ?: return@GlassDialog
                     Text("Elegir meta", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
                     if (list.isEmpty()) {
-                        Text("Primero crea una meta en la app StudyGrid.", style = MaterialTheme.typography.bodyMedium)
+                        Text("Primero crea una meta en la app Habitum Aqua.", style = MaterialTheme.typography.bodyMedium)
                         BubbleButton("Cerrar", LocalAero.current.accent, onClick = { finish() })
                     }
                     list.forEach { goal ->
