@@ -1,5 +1,6 @@
 package com.pesa.studygrid.ui
 
+import android.util.Log
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
@@ -22,6 +23,7 @@ import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.flow.drop
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.temporal.TemporalAdjusters
 
 /** [week] = active days in the current Monday..Sunday week (for the weekly goal). */
@@ -53,6 +55,26 @@ fun computeStats(active: Set<LocalDate>, today: LocalDate): GoalStats {
     return GoalStats(current, best, active.size, week)
 }
 
+/** Streak lengths that earn a badge; earned once [GoalStats.best] reaches them, so never lost. */
+val STREAK_BADGES = listOf(7, 30, 100)
+
+/** Highest badge whose threshold the current streak just reached; a streak broken and rebuilt re-triggers it. */
+fun newlyReachedBadge(before: GoalStats, after: GoalStats): Int? =
+    STREAK_BADGES.lastOrNull { before.current < it && after.current >= it }
+
+data class MonthStat(val month: YearMonth, val activeDays: Int, val avgLevel: Float)
+
+/** Last [months] months ending at today's, oldest first; months without activity are zeros. */
+fun monthlyStats(logs: Map<LocalDate, DailyLogEntity>, today: LocalDate, months: Int = 6): List<MonthStat> {
+    val byMonth = logs.filter { it.value.intensity > 0 }.entries.groupBy({ YearMonth.from(it.key) }, { it.value.intensity })
+    val current = YearMonth.from(today)
+    return (months - 1 downTo 0).map { back ->
+        val m = current.minusMonths(back.toLong())
+        val levels = byMonth[m].orEmpty()
+        MonthStat(m, levels.size, if (levels.isEmpty()) 0f else levels.sum().toFloat() / levels.size)
+    }
+}
+
 class StudyViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = StudyRepository(AppDatabase.get(app).dao())
     private val resolver = app.contentResolver
@@ -78,18 +100,34 @@ class StudyViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    private suspend fun statsOf(goalId: Long) =
+        computeStats(repo.logsOf(goalId).filter { it.intensity > 0 }.map { LocalDate.ofEpochDay(it.epochDay) }.toSet(), LocalDate.now())
+
+    /** Sends a badge message (no undo) if the change just made reached a streak badge. */
+    private suspend fun announceBadge(goalId: Long, statsBefore: GoalStats) {
+        val badge = newlyReachedBadge(statsBefore, statsOf(goalId)) ?: return
+        val title = goals.value?.firstOrNull { it.goal.id == goalId }?.goal?.title ?: return
+        _messages.send(UiMessage("Logro: racha de $badge días en \"$title\""))
+    }
+
     fun bumpToday(goalId: Long) = viewModelScope.launch {
         val today = LocalDate.now()
         val before = repo.log(goalId, today)
+        if ((before?.intensity ?: 0) >= MAX_LEVEL) {
+            _messages.send(UiMessage("Hoy ya está al máximo ($MAX_LEVEL/$MAX_LEVEL)"))
+            return@launch
+        }
+        val statsBefore = statsOf(goalId)
         repo.bump(goalId, today)
-        val level = minOf((before?.intensity ?: 0) + 1, MAX_LEVEL)
-        _messages.send(UiMessage("Hoy: nivel $level") { repo.restoreLog(goalId, today, before) })
+        announceBadge(goalId, statsBefore)
     }
 
     fun saveLog(goalId: Long, date: LocalDate, intensity: Int, note: String) = viewModelScope.launch {
         val before = repo.log(goalId, date)
+        val statsBefore = statsOf(goalId)
         repo.saveLog(goalId, date, intensity, note)
         _messages.send(UiMessage("Día guardado") { repo.restoreLog(goalId, date, before) })
+        announceBadge(goalId, statsBefore)
     }
 
     fun saveGoal(goal: GoalEntity) = viewModelScope.launch { repo.saveGoal(goal) }
@@ -109,7 +147,10 @@ class StudyViewModel(app: Application) : AndroidViewModel(app) {
             val json = repo.exportJson()
             resolver.openOutputStream(uri, "wt")!!.use { it.write(json.toByteArray()) }
         }.onSuccess { _messages.send(UiMessage("Respaldo exportado")) }
-            .onFailure { _messages.send(UiMessage("No se pudo exportar: ${it.message}")) }
+            .onFailure {
+                Log.w("StudyViewModel", "export failed", it)
+                _messages.send(UiMessage("No se pudo exportar el respaldo."))
+            }
     }
 
     fun import(uri: Uri) = viewModelScope.launch(Dispatchers.IO) {
@@ -117,6 +158,9 @@ class StudyViewModel(app: Application) : AndroidViewModel(app) {
             val text = resolver.openInputStream(uri)!!.use { it.readBytes().decodeToString() }
             repo.importJson(text)
         }.onSuccess { _messages.send(UiMessage("Respaldo importado")) }
-            .onFailure { _messages.send(UiMessage("Archivo inválido, no se cambió nada: ${it.message}")) }
+            .onFailure {
+                Log.w("StudyViewModel", "import failed", it)
+                _messages.send(UiMessage("No se pudo leer el archivo. Elige un respaldo de StudyGrid."))
+            }
     }
 }

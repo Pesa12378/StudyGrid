@@ -7,4 +7,6 @@
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="1800000"
     android:widgetCategory="home_screen"
+    android:configure="com.pesa.studygrid.widget.WidgetConfigActivity"
+    android:widgetFeatures="reconfigurable"
     android:initialLayout="@layout/glance_default_loading_layout" />

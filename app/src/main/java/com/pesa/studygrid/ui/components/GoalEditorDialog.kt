@@ -1,5 +1,6 @@
 package com.pesa.studygrid.ui.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.selection.selectable
@@ -87,7 +88,7 @@ fun GoalEditorDialog(initial: GoalEntity?, onSave: (GoalEntity) -> Unit, onDelet
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Meta semanal", style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
-            TextButton(onClick = { weekly-- }, enabled = weekly > 0) { Text("−", style = MaterialTheme.typography.titleLarge) }
+            TextButton(onClick = { weekly-- }, modifier = Modifier.size(48.dp), contentPadding = PaddingValues(0.dp), enabled = weekly > 0) { Text("−", style = MaterialTheme.typography.titleLarge) }
             Text(
                 if (weekly == 0) "Sin meta" else "$weekly ${if (weekly == 1) "día" else "días"}",
                 style = MaterialTheme.typography.bodyMedium,
@@ -95,7 +96,7 @@ fun GoalEditorDialog(initial: GoalEntity?, onSave: (GoalEntity) -> Unit, onDelet
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(min = 68.dp),
             )
-            TextButton(onClick = { weekly++ }, enabled = weekly < 7) { Text("+", style = MaterialTheme.typography.titleLarge) }
+            TextButton(onClick = { weekly++ }, modifier = Modifier.size(48.dp), contentPadding = PaddingValues(0.dp), enabled = weekly < 7) { Text("+", style = MaterialTheme.typography.titleLarge) }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
             if (initial != null) {
@@ -104,7 +105,7 @@ fun GoalEditorDialog(initial: GoalEntity?, onSave: (GoalEntity) -> Unit, onDelet
             }
             TextButton(onClick = onDismiss) { Text("Cancelar") }
             Spacer(Modifier.width(8.dp))
-            GelButton("Guardar", Color(color), enabled = title.isNotBlank(), onClick = {
+            BubbleButton("Guardar", Color(color), enabled = title.isNotBlank(), onClick = {
                 onSave((initial ?: GoalEntity(title = "", color = color)).copy(title = title.trim(), description = description.trim(), color = color, weeklyTarget = weekly))
             })
         }
@@ -134,7 +135,7 @@ fun DeleteGoalDialog(goal: GoalEntity, onConfirm: () -> Unit, onDismiss: () -> U
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onDismiss) { Text("Cancelar") }
             Spacer(Modifier.width(8.dp))
-            GelButton("Eliminar", DangerRed, onClick = onConfirm, enabled = matches)
+            BubbleButton("Eliminar", DangerRed, onClick = onConfirm, enabled = matches)
         }
     }
 }
@@ -147,7 +148,7 @@ fun ConfirmDialog(title: String, text: String, confirmLabel: String, onConfirm: 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onDismiss) { Text("Cancelar") }
             Spacer(Modifier.width(8.dp))
-            GelButton(confirmLabel, DangerRed, onClick = onConfirm)
+            BubbleButton(confirmLabel, DangerRed, onClick = onConfirm)
         }
     }
 }

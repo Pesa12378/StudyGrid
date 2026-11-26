@@ -22,6 +22,7 @@ val GoalPalette = listOf(Aqua, Lime, Sky, Violet, Coral)
 /** Aero-specific tokens Material's ColorScheme has no slot for. */
 @Immutable
 data class AeroColors(
+    val dark: Boolean,
     /** Laid over the background photo: darkens it to "night" in dark mode, softens it in light mode. */
     val scrim: Color,
     val glassTint: Color,
@@ -30,26 +31,25 @@ data class AeroColors(
     val emptyCellBorder: Color,
     val dialogBg: Color,
     val muted: Color,
-    /** Metal bezel gradient, top to bottom. */
-    val chrome: List<Color>,
-    /** Glossy center of round chrome buttons (light, deep). */
+    /** Accent (light, deep) for gel buttons and glass-button glow. */
     val accent: Color,
     val accentDeep: Color,
-    val tabText: Color,
+    /** Icon color on glass buttons. */
+    val ink: Color,
 )
 
 private val DarkAero = AeroColors(
+    dark = true,
     scrim = Color(0xFF041322).copy(alpha = 0.62f),
     glassTint = Color.White.copy(alpha = 0.08f),
     graphPanel = Color(0xFF0A1A2B).copy(alpha = 0.62f),
     emptyCell = Color.White.copy(alpha = 0.07f),
     emptyCellBorder = Color.White.copy(alpha = 0.12f),
-    dialogBg = Color(0xFF0E2236).copy(alpha = 0.85f),
+    dialogBg = Color(0xFF0E2236).copy(alpha = 0.97f),
     muted = Color(0xFF9CC0DD),
-    chrome = listOf(Color(0xFFDCE8F5), Color(0xFF6F8BA8), Color(0xFFB9CCE0), Color(0xFF2F4660), Color(0xFF9FB6CF)),
     accent = Color(0xFF6FB6FF),
     accentDeep = Color(0xFF1F4FA8),
-    tabText = Color(0xFF0B1E33),
+    ink = Color.White,
 )
 
 // Day palette sampled from the user's "Green and Blue" moodboard (turquoise water, jade, teal, marble blue).
@@ -59,17 +59,17 @@ private val DeepTeal = Color(0xFF026B72)
 private val AbyssTeal = Color(0xFF0E504F)
 
 private val LightAero = AeroColors(
+    dark = false,
     scrim = Turquoise.copy(alpha = 0.16f),
     glassTint = Color(0xFFE6FAF7).copy(alpha = 0.32f),
     graphPanel = Color(0xFFE9FBF7).copy(alpha = 0.62f),
     emptyCell = AbyssTeal.copy(alpha = 0.09f),
     emptyCellBorder = AbyssTeal.copy(alpha = 0.17f),
-    dialogBg = Color(0xFFF1FCFA).copy(alpha = 0.90f),
+    dialogBg = Color(0xFFF1FCFA).copy(alpha = 0.97f),
     muted = Color(0xFF1A5C5A),
-    chrome = listOf(Color(0xFFF2FBF9), Color(0xFF8FC9C1), Color(0xFFE1F4F0), Color(0xFF2F7F7A), Color(0xFFBFE6DF)),
     accent = Jade,
     accentDeep = DeepTeal,
-    tabText = AbyssTeal,
+    ink = DeepTeal,
 )
 
 val LocalAero = staticCompositionLocalOf { DarkAero }

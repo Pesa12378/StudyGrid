@@ -68,7 +68,7 @@ fun ReminderDialog(onDismiss: () -> Unit) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onDismiss) { Text("Cancelar") }
             Spacer(Modifier.width(8.dp))
-            GelButton("Guardar", LocalAero.current.accent, onClick = {
+            BubbleButton("Guardar", LocalAero.current.accent, onClick = {
                 val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
                 if (on && !granted) askPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                 else { save(); onDismiss() }

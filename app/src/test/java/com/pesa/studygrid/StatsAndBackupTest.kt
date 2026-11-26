@@ -4,7 +4,11 @@ import com.pesa.studygrid.data.BackupJson
 import com.pesa.studygrid.data.DailyLogEntity
 import com.pesa.studygrid.data.GoalEntity
 import com.pesa.studygrid.ui.GoalStats
+import com.pesa.studygrid.ui.MonthStat
 import com.pesa.studygrid.ui.computeStats
+import com.pesa.studygrid.ui.monthlyStats
+import com.pesa.studygrid.ui.newlyReachedBadge
+import java.time.YearMonth
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
@@ -37,6 +41,37 @@ class StatsAndBackupTest {
         assertEquals(GoalStats(3, 3, 3, 3), computeStats(active, newYear))
     }
 
+    private fun logs(vararg e: Pair<LocalDate, Int>) =
+        e.associate { (d, i) -> d to DailyLogEntity(1, d.toEpochDay(), i, "") }
+
+    @Test fun monthlyEmptyIsSixZeroMonthsOldestFirst() {
+        val r = monthlyStats(emptyMap(), today)
+        assertEquals(6, r.size)
+        assertEquals(YearMonth.of(2026, 6), r.first().month)
+        assertEquals(YearMonth.of(2026, 11), r.last().month)
+        assertEquals(MonthStat(YearMonth.of(2026, 8), 0, 0f), r[2])
+    }
+
+    @Test fun monthlyIgnoresIntensityZeroAndAverages() {
+        val r = monthlyStats(logs(LocalDate.of(2026, 11, 1) to 1, LocalDate.of(2026, 11, 2) to 4, LocalDate.of(2026, 11, 3) to 0), today)
+        assertEquals(MonthStat(YearMonth.of(2026, 11), 2, 2.5f), r.last())
+    }
+
+    @Test fun monthlyBoundariesAndOutOfRange() {
+        val r = monthlyStats(
+            logs(
+                LocalDate.of(2026, 10, 31) to 2, LocalDate.of(2026, 11, 1) to 3,
+                LocalDate.of(2026, 5, 31) to 4, // before the 6-month window
+            ),
+            today,
+        )
+        assertEquals(1, r[4].activeDays)
+        assertEquals(2f, r[4].avgLevel)
+        assertEquals(1, r[5].activeDays)
+        assertEquals(3f, r[5].avgLevel)
+        assertEquals(0, r.sumOf { it.activeDays } - 2)
+    }
+
     @Test fun backupRoundTrip() {
         val goals = listOf(GoalEntity(1, "Roadmap Data Engineer", "SQL + Kimball", 0xFF2BD9FE.toInt(), 5), GoalEntity(7, "Inglés", "", 0xFF7AE582.toInt()))
         val logs = listOf(DailyLogEntity(1, today.toEpochDay(), 3, "Capítulo 3 \"Kimball\""), DailyLogEntity(7, today.minusDays(1).toEpochDay(), 0, "solo nota"))
@@ -67,6 +102,15 @@ class StatsAndBackupTest {
         val json = BackupJson.encode(listOf(GoalEntity(1, "A", "", 0)), listOf(DailyLogEntity(1, 0, 9)))
         assertThrows(IllegalArgumentException::class.java) { BackupJson.decode(json) }
     }
+
+    private fun cur(n: Int) = GoalStats(n, n, n, 0)
+
+    @Test fun badgeAtSeven() = assertEquals(7, newlyReachedBadge(cur(6), cur(7)))
+    @Test fun noBadgeAfterSeven() = assertEquals(null, newlyReachedBadge(cur(7), cur(8)))
+    @Test fun badgeAtThirty() = assertEquals(30, newlyReachedBadge(cur(29), cur(30)))
+    @Test fun noBadgeAtZero() = assertEquals(null, newlyReachedBadge(cur(0), cur(0)))
+    // A broken streak rebuilt to 7 re-announces the badge (documented, harmless).
+    @Test fun badgeAgainAfterReset() = assertEquals(7, newlyReachedBadge(GoalStats(0, 9, 9, 0), GoalStats(7, 9, 16, 0)))
 
     @Test fun rejectsGarbage() {
         assertThrows(Exception::class.java) { BackupJson.decode("{\"hola\": 1}") }

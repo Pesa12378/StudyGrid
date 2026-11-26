@@ -1,5 +1,6 @@
 package com.pesa.studygrid.ui.components
 
+import androidx.compose.foundation.layout.heightIn
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
 import android.graphics.Shader
@@ -62,6 +63,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -197,7 +199,7 @@ private fun DrawScope.drawCover(img: ImageBitmap, alpha: Float) {
     )
 }
 
-private val FILM = listOf(Color(0xFFFF6EC7), Color(0xFFFFE66D), Color(0xFF6EF0FF), Color(0xFFA78BFA), Color(0xFFFF6EC7))
+internal val FILM = listOf(Color(0xFFFF6EC7), Color(0xFFFFE66D), Color(0xFF6EF0FF), Color(0xFFA78BFA), Color(0xFFFF6EC7))
     .map { it.copy(alpha = 0.30f) }
 
 /** Background photo + soap bubbles slowly rising behind the cards (detail for the glass to bend). */
@@ -307,37 +309,33 @@ private fun contrast(a: Color, b: Color): Float {
 internal fun readableTextOn(background: Color): Color =
     if (contrast(background, Color.White) >= contrast(background, DarkText)) Color.White else DarkText
 
-/** Glossy "gel" button: color gradient with a specular highlight on the upper half. */
+/** Soap-bubble pill: clear body lightly tinted with [color], iridescent rim, specular and glow (see [drawBubble]). */
 @Composable
-fun GelButton(
+fun BubbleButton(
     text: String,
     color: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val shape = RoundedCornerShape(50)
-    val textColor = readableTextOn(color)
+    val dark = LocalAero.current.dark
+    // Dark tone of the button color on light glass, pale tone on dark glass; both keep the color identity.
+    val textColor = if (dark) lerp(color, Color.White, 0.75f) else lerp(color, Color.Black, 0.6f)
+    // Outer box keeps the 48dp touch target; the drawn pill is a slim 40dp.
     Box(
         modifier
+            .heightIn(min = 48.dp)
             .alpha(if (enabled) 1f else 0.4f)
-            .clip(shape)
-            .background(Brush.verticalGradient(listOf(lerp(color, Color.White, 0.30f), color, lerp(color, Color.Black, 0.25f))))
-            .drawBehind {
-                val inset = 3.dp.toPx()
-                drawRoundRect(
-                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.55f), Color.White.copy(alpha = 0.05f)), endY = size.height * 0.5f),
-                    topLeft = Offset(inset, inset / 2),
-                    size = Size(size.width - 2 * inset, size.height * 0.48f),
-                    cornerRadius = CornerRadius(size.height / 2),
-                )
-            }
-            .border(1.dp, Color.White.copy(alpha = 0.45f), shape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 10.dp),
+            .clip(RoundedCornerShape(50))
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text, color = textColor, fontWeight = FontWeight.SemiBold)
+        Box(
+            Modifier.heightIn(min = 40.dp).clip(RoundedCornerShape(50)).drawBehind { drawBubble(color, dark) }.padding(horizontal = 14.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(text, color = textColor, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+        }
     }
 }
 
@@ -361,7 +359,7 @@ fun GlassDialog(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Un
                 .fillMaxWidth()
                 .clip(shape)
                 .background(a.dialogBg)
-                .chromeBezel(28.dp)
+                .glassRim(28.dp)
                 .padding(30.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
             content = content,

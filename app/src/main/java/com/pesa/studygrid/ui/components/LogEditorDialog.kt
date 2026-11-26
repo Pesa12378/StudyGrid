@@ -44,7 +44,8 @@ import com.pesa.studygrid.ui.theme.LocalAero
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-private val DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM 'de' yyyy", Spanish)
+private val DATE_FORMAT = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", Spanish)
+private val DATE_FORMAT_YEAR = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM 'de' yyyy", Spanish)
 
 /** Edits one day. ‹ › move to the previous/next day (never past today) to fix a tap on the wrong tiny cell. */
 @Composable
@@ -59,24 +60,29 @@ fun LogEditorDialog(
     val a = LocalAero.current
     val today = LocalDate.now()
     var date by remember { mutableStateOf(initialDate) }
-    // Moving to another day loads that day's values (unsaved edits of the previous day are dropped).
+    // Moving to another day loads that day's values; unsaved edits of the current day are saved first (see [move]).
     var level by remember(date) { mutableIntStateOf(logs[date]?.intensity ?: 0) }
     var note by remember(date) { mutableStateOf(logs[date]?.note ?: "") }
+
+    fun move(delta: Long) {
+        if (level != (logs[date]?.intensity ?: 0) || note != (logs[date]?.note ?: "")) onSave(date, level, note)
+        date = date.plusDays(delta)
+    }
 
     GlassDialog(onDismiss) {
         Text(goalTitle, style = MaterialTheme.typography.labelLarge, color = a.muted)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { date = date.minusDays(1) }) {
+            IconButton(onClick = { move(-1) }, modifier = Modifier.size(48.dp)) {
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Día anterior")
             }
             Text(
-                DATE_FORMAT.format(date).replaceFirstChar { it.titlecase(Spanish) },
+                (if (date.year == today.year) DATE_FORMAT else DATE_FORMAT_YEAR).format(date).replaceFirstChar { it.titlecase(Spanish) },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f),
             )
-            IconButton(onClick = { date = date.plusDays(1) }, enabled = date.isBefore(today)) {
+            IconButton(onClick = { move(1) }, modifier = Modifier.size(48.dp), enabled = date.isBefore(today)) {
                 Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Día siguiente")
             }
         }
@@ -90,7 +96,7 @@ fun LogEditorDialog(
                         Modifier
                             .size(46.dp)
                             .clip(shape)
-                            .background(if (l == 0) a.emptyCell else levelColor(l))
+                            .background(if (l == 0) a.emptyCell else levelColor(l, color, a.dark))
                             .border(
                                 if (selected) 2.5.dp else 1.dp,
                                 if (selected) MaterialTheme.colorScheme.onSurface else a.emptyCellBorder,
@@ -120,7 +126,7 @@ fun LogEditorDialog(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onDismiss) { Text("Cancelar") }
             Spacer(Modifier.width(8.dp))
-            GelButton("Guardar", color, onClick = { onSave(date, level, note) })
+            BubbleButton("Guardar", color, onClick = { onSave(date, level, note); onDismiss() })
         }
     }
 }

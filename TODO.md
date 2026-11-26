@@ -79,11 +79,11 @@ Lista de trabajo de la auditoría del 2026-11-25. Se resuelven de uno en uno; ma
 
 ## Ideas siguientes
 
-- [ ] **22. Estadísticas por mes**: días activos y nivel promedio por mes, con una gráfica pequeña (pantalla o sección nueva).
-- [ ] **23. Elegir la meta de cada widget**: hoy muestra la primera de la lista; agregar una pantalla de configuración al colocar el widget.
-- [ ] **24. Exportar el mapa de calor como imagen** para compartirlo (renderizar la tarjeta a bitmap y abrir el menú de compartir).
-- [ ] **25. Ver notas en el mapa**: mantener presionado un día con nota muestra el texto sin abrir el editor.
-- [ ] **26. Logros**: insignias al llegar a rachas de 7, 30 y 100 días.
+- [x] **22. Estadísticas por mes**: días activos y nivel promedio por mes, con una gráfica pequeña (pantalla o sección nueva).
+- [x] **23. Elegir la meta de cada widget**: hoy muestra la primera de la lista; agregar una pantalla de configuración al colocar el widget.
+- [x] **24. Exportar el mapa de calor como imagen** para compartirlo (renderizar la tarjeta a bitmap y abrir el menú de compartir).
+- [x] **25. Ver notas en el mapa**: mantener presionado un día con nota muestra el texto sin abrir el editor.
+- [x] **26. Logros**: insignias al llegar a rachas de 7, 30 y 100 días.
 
 ## Antes de publicar
 

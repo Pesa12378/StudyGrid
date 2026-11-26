@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -51,20 +52,26 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pesa.studygrid.data.GoalEntity
 import com.pesa.studygrid.ui.StudyViewModel
 import com.pesa.studygrid.ui.components.AeroBackground
-import com.pesa.studygrid.ui.components.ChromeRoundButton
-import com.pesa.studygrid.ui.components.ChromeSnackbar
+import com.pesa.studygrid.ui.components.GlassRoundButton
+import com.pesa.studygrid.ui.components.GlassSnackbar
 import com.pesa.studygrid.ui.components.ConfirmDialog
 import com.pesa.studygrid.ui.components.DeleteGoalDialog
 import com.pesa.studygrid.ui.components.ReminderDialog
 import com.pesa.studygrid.ui.components.GoalCard
 import com.pesa.studygrid.ui.components.GoalEditorDialog
 import com.pesa.studygrid.ui.components.LogEditorDialog
+import com.pesa.studygrid.ui.components.StatsDialog
+import com.pesa.studygrid.ui.monthlyStats
 import com.pesa.studygrid.ui.components.glass
-import com.pesa.studygrid.ui.components.chromeBezel
+import com.pesa.studygrid.ui.components.glassRim
 import com.pesa.studygrid.ui.theme.LocalAero
 import com.pesa.studygrid.R
 import com.pesa.studygrid.ui.components.LocalBackdrop
 import androidx.compose.foundation.Image
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.pesa.studygrid.ui.components.GelGlyph
+import com.pesa.studygrid.ui.components.GelIcon
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
@@ -102,6 +109,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
     var pendingImport by remember { mutableStateOf<Uri?>(null) }
     var menuOpen by remember { mutableStateOf(false) }
     var showReminder by remember { mutableStateOf(false) }
+    var statsGoalId by remember { mutableStateOf<Long?>(null) }
 
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
         uri?.let(vm::export)
@@ -124,14 +132,13 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                 contentColor = MaterialTheme.colorScheme.onSurface,
                 topBar = {
                     TopAppBar(
-                        title = { Text("StudyGrid", fontWeight = FontWeight.Bold) },
+                        title = { Text("StudyGrid", fontWeight = FontWeight.Bold, style = androidx.compose.material3.LocalTextStyle.current.copy(shadow = androidx.compose.ui.graphics.Shadow(Color.Black.copy(alpha = 0.35f), androidx.compose.ui.geometry.Offset(0f, 2f), 4f))) },
                         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                         actions = {
                             IconButton(onClick = onToggleDark) {
-                                Image(
-                                    painterResource(if (dark) R.drawable.emoji_sun else R.drawable.emoji_crescent_moon),
-                                    contentDescription = if (dark) "Cambiar a modo claro" else "Cambiar a modo oscuro",
-                                    modifier = Modifier.size(28.dp),
+                                GelIcon(
+                                    if (dark) GelGlyph.Sun else GelGlyph.Moon,
+                                    Modifier.semantics { contentDescription = if (dark) "Cambiar a modo claro" else "Cambiar a modo oscuro" },
                                 )
                             }
                             Box {
@@ -144,6 +151,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                                             exportLauncher.launch("studygrid-respaldo-${LocalDate.now()}.json")
                                         },
                                     )
+                                    HorizontalDivider()
                                     DropdownMenuItem(
                                         text = { Text("Importar respaldo (.json)") },
                                         onClick = {
@@ -162,11 +170,11 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                     )
                 },
                 floatingActionButton = {
-                    ChromeRoundButton(onClick = { goalDialog = GoalDialog.New }, contentDescription = "Nueva meta", size = 66.dp) {
-                        Icon(Icons.Filled.Add, contentDescription = null, tint = Color.White, modifier = Modifier.size(30.dp))
+                    GlassRoundButton(onClick = { goalDialog = GoalDialog.New }, contentDescription = "Nueva meta", size = 56.dp, tintAlpha = 0.75f) {
+                        Icon(Icons.Filled.Add, contentDescription = null, tint = LocalAero.current.ink, modifier = Modifier.size(30.dp))
                     }
                 },
-                snackbarHost = { SnackbarHost(snackbar) { ChromeSnackbar(it) } },
+                snackbarHost = { SnackbarHost(snackbar) { GlassSnackbar(it) } },
             ) { padding ->
                 val list = goals
                 // Local copy so dragging reorders instantly; re-synced whenever the DB emits.
@@ -183,7 +191,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                     else -> LazyColumn(
                         modifier = Modifier.padding(top = padding.calculateTopPadding()),
                         state = lazyState,
-                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = padding.calculateBottomPadding() + 104.dp),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = padding.calculateBottomPadding() + 104.dp + if (snackbar.currentSnackbarData != null) 80.dp else 0.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         items(local, key = { it.goal.id }) { ui ->
@@ -198,6 +206,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                                         onBumpToday = { vm.bumpToday(ui.goal.id) },
                                         onDayClick = { date -> logTarget = ui.goal.id to date },
                                         onEdit = { goalDialog = GoalDialog.Edit(ui.goal) },
+                                        onStats = { statsGoalId = ui.goal.id },
                                     )
                                 }
                             }
@@ -227,6 +236,12 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
 
     if (showReminder) ReminderDialog(onDismiss = { showReminder = false })
 
+    statsGoalId?.let { id ->
+        val ui = goals?.find { it.goal.id == id }
+        if (ui == null) statsGoalId = null
+        else StatsDialog(ui.goal.title, Color(ui.goal.color), monthlyStats(ui.logs, LocalDate.now()), ui.logs, ui.stats) { statsGoalId = null }
+    }
+
     pendingImport?.let { uri ->
         ConfirmDialog(
             title = "¿Importar respaldo?",
@@ -247,7 +262,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
                 color = Color(ui.goal.color),
                 initialDate = date,
                 logs = ui.logs,
-                onSave = { day, level, note -> vm.saveLog(goalId, day, level, note); logTarget = null },
+                onSave = { day, level, note -> vm.saveLog(goalId, day, level, note) },
                 onDismiss = { logTarget = null },
             )
         }
@@ -258,7 +273,7 @@ fun MainScreen(dark: Boolean, onToggleDark: () -> Unit, vm: StudyViewModel = vie
 private fun EmptyState(modifier: Modifier) {
     Box(modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
         Column(
-            Modifier.glass().chromeBezel(24.dp).padding(32.dp),
+            Modifier.glass().glassRim(24.dp).padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
